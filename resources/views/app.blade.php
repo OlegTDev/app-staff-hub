@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Laravel Mantine App</title>
         @viteReactRefresh
+        @routes
         @vite(['resources/js/app.tsx'])
         @inertiaHead
     </head>
