@@ -1,6 +1,6 @@
-import { Link, usePage } from "@inertiajs/react";
-import { AppShell, Avatar, Burger, Button, Group, NavLink, Title, useMantineColorScheme } from "@mantine/core";
-import { IconArmchair, IconBuildingSkyscraper, IconFileInvoice, IconUsers } from "@tabler/icons-react";
+import { Link, router, usePage } from "@inertiajs/react";
+import { AppShell, Avatar, Burger, Button, Group, Menu, NavLink, Title, useMantineColorScheme } from "@mantine/core";
+import { IconArmchair, IconBuildingSkyscraper, IconFileInvoice, IconMoon, IconMoonFilled, IconSun, IconUsers } from "@tabler/icons-react";
 import { useState, ReactNode } from "react";
 
 interface Props {
@@ -36,9 +36,18 @@ export default function MainLayout({ children }: Props) {
           </Group>
           <Group>
             <Button onClick={() => toggleColorScheme()} variant="default" size="xs">
-              {colorScheme === 'dark' ? '☀️ Светлая' : '🌙 Темная'}
+              {colorScheme === 'dark' ? <IconSun /> : <IconMoon />}
             </Button>
-            <Avatar color="cyan" radius="xl">MK</Avatar>
+            <Menu shadow="md">
+              <Menu.Target>
+                <Avatar color="cyan" radius="xl">MK</Avatar>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item onClick={() => router.delete('/logout')}>
+                  Выход
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           </Group>
         </Group>
       </AppShell.Header>

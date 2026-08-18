@@ -8,13 +8,11 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { MantineProvider, createTheme } from "@mantine/core";
 import MainLayout from "./layouts/MainLayout";
 
-// Здесь вы можете настроить глобальную тему (шрифты, цвета, скругления)
 const theme = createTheme({
   primaryColor: "blue",
   defaultRadius: "md",
   fontFamily: "'Golos Text', system-ui, -apple-system, sans-serif",
   headings: {
-    //fontFamily: "'Golos Text', system-ui, sans-serif",
     fontWeight: "500",
   },
 });
@@ -27,6 +25,10 @@ createInertiaApp({
       `./pages/${name}.tsx`,
       pages as any,
     )) as any;
+
+    if (page.default?.layout === null) {
+      return page;
+    }
 
     page.default.layout =
       page.default.layout || ((page: any) => <MainLayout>{page}</MainLayout>);
