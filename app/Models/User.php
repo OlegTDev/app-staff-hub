@@ -6,10 +6,30 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use LdapRecord\Laravel\Auth\AuthenticatesWithLdap;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property ?\DateTime $email_verified_at
+ * @property string $password
+ * @property ?string $remember_token
+ * @property string $login
+ * @property ?string $company
+ * @property ?string $department
+ * @property ?string $position
+ * @property ?string $telephone
+ * @property string $guid
+ * @property string $domain
+ * @property ?\Carbon\CarbonInterface $created_at
+ * @property ?\Carbon\CarbonInterface $updated_at
+ *
+ * @property-read \Illuminate\Support\Collection<Role> $roles
+ */
 #[Fillable(['name', 'email', 'password', 'login', 'company', 'department', 'position', 'telephone', 'guid', 'domain'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -29,5 +49,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class);
     }
 }
