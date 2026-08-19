@@ -36,6 +36,8 @@
     },
     "scripts": {
         "ziggy-generate": "php artisan ziggy:generate --types",
+        "test-cover-xml": "php artisan test --coverage-clover=coverage.xml",
+        "test-cover": "php artisan test --coverage",
         "setup": [
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
