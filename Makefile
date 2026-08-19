@@ -15,3 +15,9 @@ docker-run-cli:
 
 docker-run-migrate:
 	docker compose run --rm php-cli php artisan migrate
+
+docker-run-tests:
+	docker compose run --rm php-cli composer test-cover
+
+docker-run-tests-cover-xml:
+	docker compose run --rm php-cli composer test-cover-xml
