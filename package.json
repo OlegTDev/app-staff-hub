@@ -27,6 +27,8 @@
         "@inertiajs/react": "^3.6.1",
         "@mantine/core": "^9.5.1",
         "@mantine/hooks": "^9.5.1",
+        "@mantine/modals": "^9.5.1",
+        "@mantine/notifications": "^9.5.1",
         "@tabler/icons-react": "^3.46.0",
         "@vitejs/plugin-react": "^6.0.5",
         "mantine-datatable": "^9.4.0",
