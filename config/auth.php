@@ -73,7 +73,7 @@ return [
                 'sync_passwords' => true,
                 'sync_attributes' => [
                     'login' => 'sAMAccountName',
-                    'email' => 'userPrincipalName',
+                    'email' => 'mail',
                     'company' => 'company',
                     'name' => 'cn',
                     'department' => 'department',
