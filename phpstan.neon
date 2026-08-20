@@ -1,0 +1,8 @@
+includes:
+    - ./vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 5                  # Уровень строгости (от 0 до 9)
+    paths:
+        - app                 # Директории для анализа
+        - tests
