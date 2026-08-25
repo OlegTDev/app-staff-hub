@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Traits\BuildsListQuery;
+use App\Http\Requests\UserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class UserController extends Controller
     {
         $paginatedData = $this->getPaginatedData(
             request: $request,
-            query: User::query(),
+            query: User::query()->with('roles')->orderBy('id', 'asc'),
             resourceClass: UserResource::class,
         );
 
@@ -30,53 +31,32 @@ class UserController extends Controller
     }
 
     /**
-     * @route GET /users/create
-     */
-    public function create()
-    {
-        //
-        return Inertia::render('Users/Create', [
-            'labels' => config('labels.user'),
-        ]);
-    }
-
-    /**
      * @route POST /users
      */
-    public function store(Request $request)
+    public function store(UserRequest $request)
     {
-        //
-    }
+        User::create($request->validated());
 
-    /**
-     * @route GET /users/{user}
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * @route GET /users/{user}/edit
-     */
-    public function edit(User $user)
-    {
-        dd($user);
+        return back()->with('success', 'Запись успешно добавлена!');
     }
 
     /**
      * @route PUT /users/{user}
      */
-    public function update(Request $request, string $id)
+    public function update(UserRequest $request, User $user): \Illuminate\Http\RedirectResponse
     {
-        //
+        $user->update($request->validated());
+
+        return back()->with('success', 'Запись успешно обновлена');
     }
 
     /**
      * @route DELETE /users/{user}
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        //
+        // trash
+
+        return back()->with('success', 'Запись успешно удалена');
     }
 }

@@ -1,28 +1,20 @@
-import { ActionIcon, Center, Group, TextInput, Title } from "@mantine/core";
+import { ActionIcon, Badge, Button, Center, Drawer, Group, Stack, TextInput, Title } from "@mantine/core";
 import { DataTable, DataTableColumn } from "mantine-datatable";
-import { User } from "./types";
+import { Role, User, UserLabels } from "./types";
 import { Head, router } from "@inertiajs/react";
 import { BaseFilters, PaginatedData } from "@/types/pagination";
 import { useDataTable } from "@/hooks/useDataTable";
 import { IconClick, IconEdit, IconTrash } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
+import { formatDate } from "@/utils/dateHelpers";
+import { useDisclosure } from "@mantine/hooks";
+import Form from "./Form";
+import { useState } from "react";
 
 type PageProps = {
   items: PaginatedData<User>;
   query: BaseFilters;
-  labels: {
-    id: string;
-    name: string;
-    email: string;
-    login: string;
-    company: string;
-    department: string;
-    position: string;
-    telephone: string;
-    domain: string;
-    created_at: string;
-    updated_at: string;
-  };
+  labels: UserLabels;
 };
 
 const title = 'Пользователи';
@@ -34,7 +26,18 @@ export default function Index({ items, query, labels }: PageProps): React.JSX.El
     query,
   });
 
-  console.log(table.loading);
+  const [opened, { open, close }] = useDisclosure(false);
+  const [selectedUser, setSelectedUser] = useState<User|undefined>();
+
+  const handleCreateClick = () => {
+    setSelectedUser(undefined);
+    open();
+  };
+
+  const handleEditClick = (user: User) => {
+    setSelectedUser(user);
+    open();
+  };
 
   const renderActions: DataTableColumn<User>['render'] = (record) => (
     <Group gap={4} justify="right" wrap="nowrap">
@@ -44,7 +47,7 @@ export default function Index({ items, query, labels }: PageProps): React.JSX.El
         color="green"
         onClick={(e) => {
           e.stopPropagation();
-          router.get(route('users.edit', { id: record.id }));
+          handleEditClick(record);
         }}
       >
         <IconEdit size={16} />
@@ -69,7 +72,16 @@ export default function Index({ items, query, labels }: PageProps): React.JSX.El
     </Group>
   );
 
+  const onSuccess = () => {
+    close();
+  };
+
+
   return <>
+    <Drawer opened={opened} onClose={close} title={title}>
+      <Form labels={labels} user={selectedUser} onSuccess={onSuccess} />
+    </Drawer>
+
     <Head title={title} />
     <Title order={1}>{title}</Title>
 
@@ -80,6 +92,10 @@ export default function Index({ items, query, labels }: PageProps): React.JSX.El
       mb="md"
     />
 
+    <Button type="button" mb="md" onClick={handleCreateClick}>
+      Добавить
+    </Button>
+
     <DataTable<User>
       withTableBorder
       records={table.records}
@@ -87,8 +103,23 @@ export default function Index({ items, query, labels }: PageProps): React.JSX.El
         { accessor: 'id', title: labels.id, sortable: false, width: 70 },
         { accessor: 'login', title: labels.login, sortable: true },
         { accessor: 'name', title: labels.name, sortable: true },
+        { accessor: 'department', title: labels.department, sortable: true },
+        { accessor: 'position', title: labels.position, sortable: true },
+        {
+          accessor: 'roles',
+          title: labels.roles,
+          render: (record: User) => (
+            <Stack gap="xs">
+              { record.roles.map((role: Role) => (<Badge key={role.id}>{role.name}</Badge>)) }
+            </Stack>
+          ),
+        },
         { accessor: 'email', title: labels.email, sortable: true },
-        { accessor: 'created_at', title: labels.created_at, sortable: true },
+        { accessor: 'created_at', title: labels.created_at, sortable: true,
+          render: (record: User) => {
+            return formatDate(record.created_at);
+          }
+         },
         { accessor: 'actions', title: (<Center><IconClick size={16} /></Center>), render: renderActions },
       ]}
       fetching={table.loading}
