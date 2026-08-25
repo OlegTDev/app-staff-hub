@@ -1,8 +1,10 @@
 import { Link, router, usePage } from "@inertiajs/react";
 import { AppShell, Avatar, Burger, Button, Group, MantineProvider, Menu, NavLink, Title, useMantineColorScheme } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
+import { Notifications } from "@mantine/notifications";
 import { IconArmchair, IconBuildingSkyscraper, IconFileInvoice, IconMoon, IconSun, IconUsers } from "@tabler/icons-react";
 import { useState, ReactNode } from "react";
+import { FlashNotifications } from "./FlashNotifications";
 
 interface Props {
   children: ReactNode;
@@ -94,11 +96,13 @@ export default function MainLayout({ children }: Props) {
           </AppShell.Navbar>
 
           <AppShell.Main>
+            <FlashNotifications />
             {children}
           </AppShell.Main>
 
         </AppShell>
       </ModalsProvider>
+      <Notifications />
     </MantineProvider>
 
   );
