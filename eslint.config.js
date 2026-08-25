@@ -52,6 +52,7 @@ export default [
         'warn',
         'never',
       ],
+      'no-undef': 'off',
     },
   },
 ];
