@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Traits;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder as BuilderEloquent;
+use Illuminate\Database\Query\Builder as BuilderQuery;
 use Illuminate\Pagination\AbstractPaginator;
 
 trait BuildsListQuery
@@ -25,7 +26,7 @@ trait BuildsListQuery
 
     public function getPaginatedData(
         Request $request,
-        BuilderEloquent $query,
+        BuilderEloquent|BuilderQuery $query,
         array $allowSortFields = [],
         array $filterFields = ['search'],
         int $perPage = 10,
@@ -65,15 +66,11 @@ trait BuildsListQuery
         return $queryClone->paginate($perPage)->withQueryString();
     }
 
-    /**
-     * @param Request $request
-     * @param BuilderEloquent|{@method filter()} $buildQuery
-     * @param array $fields
-     */
     private function applyFilter(Request $request, BuilderEloquent $buildQuery, array $fields): void
     {
         $model = $buildQuery->getModel();
-        if (method_exists($model, 'scopeFilter')) {
+        if (\method_exists($model, 'scopeFilter')) {
+            // @phpstan-ignore method.notFound
             $buildQuery->filter($request->only($fields));
         }
     }
