@@ -19,7 +19,7 @@ const theme = createTheme({
 });
 
 createInertiaApp({
-  title: (title) => `${title} - Mantine App`,
+  title: (title) => title,
   resolve: async (name) => {
     const pages = import.meta.glob("./pages/**/*.tsx");
     const page = (await resolvePageComponent(
