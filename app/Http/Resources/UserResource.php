@@ -27,10 +27,12 @@ class UserResource extends JsonResource
             'position' => $this->position,
             'telephone' => $this->telephone,
             'domain' => $this->domain,
+            'torm_code' => $this->torm_code,
             'created_at' => $this->created_at,
             'updated_at'=> $this->updated_at,
 
             'roles' => $this->whenLoaded('roles', fn() => RoleResource::collection($this->roles)),
+            'torm' => $this->whenLoaded('torm', fn() => TormResource::make($this->torm)),
         ];
     }
 }

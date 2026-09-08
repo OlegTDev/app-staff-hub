@@ -66,6 +66,13 @@ export default function FormGeneral({ user, labels, onSuccess }: FormProps): Rea
             defaultValue={user?.telephone}
             error={errors?.telephone}
           />
+          <TextInput
+            label={labels.torm_code}
+            placeholder={labels.torm_code}
+            name="torm_code"
+            defaultValue={user?.torm_code}
+            error={errors?.torm_code}
+          />
 
           <Button loading={processing} type="submit" mt="lg">
             Сохранить

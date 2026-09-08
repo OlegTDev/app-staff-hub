@@ -15,6 +15,7 @@ export interface User {
   position?: string;
   domain: string;
   telephone?: string;
+  torm_code?: string;
   created_at: string;
   updated_at: string;
 
@@ -31,6 +32,7 @@ export type UserLabels = {
   position: string;
   telephone: string;
   domain: string;
+  torm_code: string;
   created_at: string;
   updated_at: string;
   roles: string;

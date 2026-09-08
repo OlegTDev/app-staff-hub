@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Dictionary\Torm;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use LdapRecord\Laravel\Auth\AuthenticatesWithLdap;
@@ -26,12 +28,14 @@ use LdapRecord\Laravel\Auth\AuthenticatesWithLdap;
  * @property ?string $telephone
  * @property string $guid
  * @property string $domain
- * @property ?\Carbon\CarbonInterface $created_at
- * @property ?\Carbon\CarbonInterface $updated_at
+ * @property string $torm_code
+ * @property \Carbon\CarbonInterface $created_at
+ * @property \Carbon\CarbonInterface $updated_at
  *
  * @property-read \Illuminate\Support\Collection<Role> $roles
+ * @property-read ?Torm $torm
  */
-#[Fillable(['name', 'email', 'password', 'login', 'company', 'department', 'position', 'telephone', 'guid', 'domain'])]
+#[Fillable(['name', 'email', 'password', 'login', 'company', 'department', 'position', 'telephone', 'guid', 'domain', 'torm_code'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -68,6 +72,11 @@ class User extends Authenticatable
     public function hasRole(string $name): bool
     {
         return $this->roles()->where('name', $name)->exists();
+    }
+
+    public function torm(): HasOne
+    {
+        return $this->hasOne(Torm::class, 'code', 'torm_code');
     }
 
 }
