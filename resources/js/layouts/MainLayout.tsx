@@ -1,10 +1,32 @@
 import { Link, router, usePage } from "@inertiajs/react";
-import { AppShell, Avatar, Burger, Button, Group, MantineProvider, Menu, NavLink, Title, useMantineColorScheme } from "@mantine/core";
+import {
+  AppShell,
+  Avatar,
+  Burger,
+  Button,
+  Group,
+  MantineProvider,
+  Menu,
+  NavLink,
+  Title,
+  useMantineColorScheme,
+} from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
-import { IconArmchair, IconBuildingSkyscraper, IconFileInvoice, IconMoon, IconSun, IconUsers } from "@tabler/icons-react";
+import {
+  IconArmchair,
+  IconBook2,
+  IconBuildings,
+  IconBuildingSkyscraper,
+  IconFileInvoice,
+  IconMoon,
+  IconSun,
+  IconUserCircle,
+  IconUsers,
+} from "@tabler/icons-react";
 import { useState, ReactNode } from "react";
 import { FlashNotifications } from "./FlashNotifications";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Props {
   children: ReactNode;
@@ -14,41 +36,67 @@ export default function MainLayout({ children }: Props) {
   const [opened, setOpened] = useState(false);
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const currentUrl = usePage().url;
+  const { isAdmin, user } = useAuth();
 
   return (
     <MantineProvider>
       <ModalsProvider>
         <AppShell
           header={{ height: 60 }}
-          navbar={{ width: 250, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+          navbar={{
+            width: 250,
+            breakpoint: "sm",
+            collapsed: { mobile: !opened },
+          }}
           padding="md"
           styles={(theme) => ({
             main: {
-              backgroundColor: colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
+              backgroundColor:
+                colorScheme === "dark"
+                  ? theme.colors.dark[8]
+                  : theme.colors.gray[0],
             },
             navbar: {
-              backgroundColor: colorScheme === 'dark' ? theme.colors.dark[9] : theme.colors.gray[2],
-            }
+              backgroundColor:
+                colorScheme === "dark"
+                  ? theme.colors.dark[9]
+                  : theme.colors.gray[2],
+            },
           })}
         >
           <AppShell.Header>
             <Group h="100%" px="lg" justify="space-between">
               <Group>
-                <Burger opened={opened} onClick={() => setOpened(!opened)} hiddenFrom="sm" size="sm">
-                  <Title order={4} fw={600}>HubControl</Title>
+                <Burger
+                  opened={opened}
+                  onClick={() => setOpened(!opened)}
+                  hiddenFrom="sm"
+                  size="sm"
+                >
+                  <Title order={4} fw={600}>
+                    HubControl
+                  </Title>
                 </Burger>
-                <Title order={4}>УФНС России по Ханты-Мансийскому автономному округу - Югре</Title>
+                <Title order={4}>
+                  УФНС России по Ханты-Мансийскому автономному округу - Югре
+                </Title>
               </Group>
               <Group>
-                <Button onClick={() => toggleColorScheme()} variant="default" size="xs">
-                  {colorScheme === 'dark' ? <IconSun /> : <IconMoon />}
+                <Button
+                  onClick={() => toggleColorScheme()}
+                  variant="default"
+                  size="xs"
+                >
+                  {colorScheme === "dark" ? <IconSun /> : <IconMoon />}
                 </Button>
                 <Menu shadow="md">
                   <Menu.Target>
-                    <Avatar color="cyan" radius="xl">MK</Avatar>
+                    <Avatar color="cyan" radius="xl">
+                      <IconUserCircle cursor="pointer" />
+                    </Avatar>
                   </Menu.Target>
                   <Menu.Dropdown>
-                    <Menu.Item onClick={() => router.delete('/logout')}>
+                    <Menu.Item onClick={() => router.delete("/logout")}>
                       Выход
                     </Menu.Item>
                   </Menu.Dropdown>
@@ -58,21 +106,43 @@ export default function MainLayout({ children }: Props) {
           </AppShell.Header>
 
           <AppShell.Navbar>
-            <NavLink
-              component={Link}
-              href="/users"
-              label="Пользователи и роли"
-              leftSection={<IconUsers />}
-              active={currentUrl.startsWith('/users')}
-              color="gray"
-            />
+            {isAdmin && (
+              <NavLink
+                component={Link}
+                href="/users"
+                label="Пользователи и роли"
+                leftSection={<IconUsers />}
+                active={currentUrl.startsWith("/users")}
+                color="gray"
+              />
+            )}
+
+            {isAdmin && (
+              <NavLink
+                component={Link}
+                href="/dictionary"
+                label="Справочники"
+                leftSection={<IconBook2 />}
+                active={currentUrl.startsWith("/dictionary")}
+                color="gray"
+              >
+                <NavLink
+                  component={Link}
+                  href="/dictionary/torms"
+                  label="Список ТОРМ"
+                  leftSection={<IconBuildings />}
+                  active={currentUrl.startsWith("/dictionary/torms")}
+                  color="gray"
+                />
+              </NavLink>
+            )}
 
             <NavLink
               component={Link}
               href="/"
               label="Санаторно-курортное лечение"
               leftSection={<IconBuildingSkyscraper />}
-              active={currentUrl === '/'}
+              active={currentUrl === "/"}
               color="gray"
             >
               <NavLink
@@ -80,7 +150,7 @@ export default function MainLayout({ children }: Props) {
                 href="/new"
                 label="Санатории"
                 leftSection={<IconArmchair />}
-                active={currentUrl.startsWith('/new')}
+                active={currentUrl.startsWith("/new")}
                 color="gray"
               />
               <NavLink
@@ -88,22 +158,19 @@ export default function MainLayout({ children }: Props) {
                 href="/test"
                 label="Заявления"
                 leftSection={<IconFileInvoice />}
-                active={currentUrl.startsWith('/test')}
+                active={currentUrl.startsWith("/test")}
                 color="gray"
               />
             </NavLink>
-
           </AppShell.Navbar>
 
           <AppShell.Main>
             <FlashNotifications />
             {children}
           </AppShell.Main>
-
         </AppShell>
       </ModalsProvider>
       <Notifications />
     </MantineProvider>
-
   );
 }
