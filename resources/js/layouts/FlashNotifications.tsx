@@ -1,14 +1,7 @@
 import { useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
 import { notifications } from '@mantine/notifications';
-
-interface PageProps {
-  flash: {
-    success: string | null;
-    error: string | null;
-  };
-  [key: string]: any;
-}
+import { PageProps } from '@/types';
 
 export function FlashNotifications() {
   const { flash } = usePage<PageProps>().props;

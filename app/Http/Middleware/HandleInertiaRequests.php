@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use App;
+use App\Http\Resources\UserResource;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -40,13 +42,13 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => function () use ($request) {
+                /** @var \App\Models\User|null */
                 $user = $request->user();
                 if ($user !== null) {
-
+                    $user->load('roles');
+                    return ['user' => UserResource::make($user)];
                 }
-                return [
-
-                ];
+                return [];
             },
             'flash' => fn() =>
                 [
