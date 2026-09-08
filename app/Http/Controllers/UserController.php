@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Traits\BuildsListQuery;
 use App\Http\Requests\UserRequest;
+use App\Http\Resources\RoleResource;
 use App\Http\Resources\UserResource;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,6 +29,7 @@ class UserController extends Controller
         return Inertia::render('Users/Index', [
             ...$paginatedData,
             'labels' => config('labels.user'),
+            'roles' => RoleResource::collection(Role::all()),
         ]);
     }
 
