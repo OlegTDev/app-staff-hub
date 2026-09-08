@@ -6,13 +6,14 @@ use Inertia\Inertia;
 
 require __DIR__ . '/web/auth.php';
 
-Route::middleware('auth')->group(function() {
-    Route::get('/', function () {
+Route::middleware('auth')->group(static function() {
+    Route::get('/', static function () {
         return Inertia::render('Welcome');
     });
 
     require __DIR__ . '/web/users.php';
     require __DIR__ . '/web/roles.php';
+    require __DIR__ . '/web/dictionary.php';
 });
 
 
