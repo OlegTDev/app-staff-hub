@@ -1,14 +1,15 @@
 import { Button, Stack, TextInput } from "@mantine/core";
-import { User, UserLabels } from "./types";
 import { Form as FormInertia } from '@inertiajs/react';
+import { Role, User, UserLabels } from "../types";
 
 type FormProps = {
   user?: User;
   labels: UserLabels;
+  roles: Role[];
   onSuccess(): void;
 };
 
-export default function Form({ user, labels, onSuccess }: FormProps): React.JSX.Element {
+export default function FormGeneral({ user, labels, onSuccess }: FormProps): React.JSX.Element {
   const formAction = user === undefined ? route('users.store') : route('users.update', { id: user.id });
   const formMethod = user === undefined ? 'POST': 'PUT';
 

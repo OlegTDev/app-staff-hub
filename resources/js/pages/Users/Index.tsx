@@ -1,45 +1,53 @@
-import { ActionIcon, Badge, Button, Center, Drawer, Group, Stack, TextInput, Title } from "@mantine/core";
+import { ActionIcon, Badge, Button, Center, Drawer, Group, Stack, TextInput, Title, Tooltip } from "@mantine/core";
 import { DataTable, DataTableColumn } from "mantine-datatable";
 import { Role, User, UserLabels } from "./types";
 import { Head, router } from "@inertiajs/react";
 import { BaseFilters, PaginatedData } from "@/types/pagination";
 import { useDataTable } from "@/hooks/useDataTable";
-import { IconClick, IconEdit, IconTrash } from "@tabler/icons-react";
+import { IconClick, IconEditCircle, IconTrash, IconUsers } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import { formatDate } from "@/utils/dateHelpers";
 import { useDisclosure } from "@mantine/hooks";
-import Form from "./Form";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import FormGeneral from "./Forms/General";
+import FormRoles from "./Forms/Roles";
 
 type PageProps = {
   items: PaginatedData<User>;
   query: BaseFilters;
   labels: UserLabels;
+  roles: Role[];
 };
 
 const title = 'Пользователи';
 
-export default function Index({ items, query, labels }: PageProps): React.JSX.Element {
+export default function Index({ items, query, labels, roles }: PageProps): React.JSX.Element {
   const table = useDataTable<User>({
     routeName: route('users.index'),
     items,
     query,
   });
 
-  const [opened, { open, close }] = useDisclosure(false);
+  const [openedGeneral, { open: openGeneral, close: closeGeneral }] = useDisclosure(false);
+  const [openedRoles, { open: openRoles, close: closeRoles }] = useDisclosure(false);
   const [selectedUser, setSelectedUser] = useState<User|undefined>();
 
   const handleCreateClick = () => {
     setSelectedUser(undefined);
-    open();
+    openGeneral();
   };
 
   const handleEditClick = (user: User) => {
     setSelectedUser(user);
-    open();
+    openGeneral();
   };
 
-  const renderActions: DataTableColumn<User>['render'] = (record) => (
+  const handleRolesClick = (user: User) => {
+    setSelectedUser(user);
+    openRoles();
+  };
+
+  const renderActions: DataTableColumn<User>['render'] = useCallback((record) => (
     <Group gap={4} justify="right" wrap="nowrap">
       <ActionIcon
         size="sm"
@@ -50,7 +58,22 @@ export default function Index({ items, query, labels }: PageProps): React.JSX.El
           handleEditClick(record);
         }}
       >
-        <IconEdit size={16} />
+        <Tooltip label="Редактирование основной информации пользователя">
+          <IconEditCircle size={16} />
+        </Tooltip>
+      </ActionIcon>
+      <ActionIcon
+        size="sm"
+        variant="transparent"
+        color="green"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleRolesClick(record);
+        }}
+      >
+        <Tooltip label="Редактирование ролей пользователя">
+          <IconUsers size={16} />
+        </Tooltip>
       </ActionIcon>
       <ActionIcon
         size="sm"
@@ -70,19 +93,30 @@ export default function Index({ items, query, labels }: PageProps): React.JSX.El
         <IconTrash size={16} />
       </ActionIcon>
     </Group>
-  );
+  ), []);
 
-  const onSuccess = () => {
-    close();
+  const onSuccessGeneral = () => {
+    closeGeneral();
+  };
+
+  const onSuccessRoles = () => {
+    closeRoles();
   };
 
 
   return <>
-    <Drawer opened={opened} onClose={close} title={title}>
-      <Form labels={labels} user={selectedUser} onSuccess={onSuccess} />
+    <Drawer opened={openedGeneral} onClose={closeGeneral} title={selectedUser ? 'Редактировать пользователя' : 'Добавить пользователя'}>
+      <FormGeneral labels={labels} user={selectedUser} roles={roles} onSuccess={onSuccessGeneral} />
+    </Drawer>
+
+    <Drawer opened={openedRoles} onClose={closeRoles} title="Роли">
+      {selectedUser && (
+        <FormRoles idUser={selectedUser.id} roles={roles} userRoles={selectedUser?.roles ? selectedUser.roles : []} onSuccess={onSuccessRoles} />
+      )}
     </Drawer>
 
     <Head title={title} />
+
     <Title order={1}>{title}</Title>
 
     <TextInput
