@@ -2,4 +2,6 @@
 
 use App\Http\Controllers\UserController;
 
-Route::resource('users', UserController::class)->except(['create', 'edit']);
+Route::middleware('roles:admin')->group(static function () {
+    Route::resource('users', UserController::class)->except(['create', 'edit']);
+});
