@@ -30,6 +30,7 @@ class UserRequest extends FormRequest
             'department' => ['string', 'nullable'],
             'position' => ['string', 'nullable'],
             'telephone' => ['string', 'nullable'],
+            'torm_code' => ['string', 'nullable'],
         ];
     }
 }
