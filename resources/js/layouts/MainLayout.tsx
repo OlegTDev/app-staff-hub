@@ -9,6 +9,7 @@ import {
   Menu,
   NavLink,
   Title,
+  Tooltip,
   useMantineColorScheme,
 } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
@@ -92,7 +93,9 @@ export default function MainLayout({ children }: Props) {
                 <Menu shadow="md">
                   <Menu.Target>
                     <Avatar color="cyan" radius="xl">
-                      <IconUserCircle cursor="pointer" />
+                      <Tooltip label={user?.name}>
+                        <IconUserCircle cursor="pointer" />
+                      </Tooltip>
                     </Avatar>
                   </Menu.Target>
                   <Menu.Dropdown>
@@ -139,7 +142,7 @@ export default function MainLayout({ children }: Props) {
 
             <NavLink
               component={Link}
-              href="/"
+              href="#"
               label="Санаторно-курортное лечение"
               leftSection={<IconBuildingSkyscraper />}
               active={currentUrl === "/"}
@@ -147,10 +150,10 @@ export default function MainLayout({ children }: Props) {
             >
               <NavLink
                 component={Link}
-                href="/new"
+                href="/dictionary/sanatoriums"
                 label="Санатории"
                 leftSection={<IconArmchair />}
-                active={currentUrl.startsWith("/new")}
+                active={currentUrl.startsWith("/dictionary/sanatoriums")}
                 color="gray"
               />
               <NavLink
