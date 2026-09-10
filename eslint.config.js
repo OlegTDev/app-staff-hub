@@ -53,6 +53,7 @@ export default [
         'never',
       ],
       'no-undef': 'off',
+      'no-unused-vars': 'off',
     },
   },
 ];
