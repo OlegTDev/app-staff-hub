@@ -5,6 +5,8 @@ RUN apk add --no-cache \
         libzip \
         libpq \
         libldap \
+        libjpeg-turbo \
+        libwebp \
     && apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         unzip \
@@ -13,6 +15,9 @@ RUN apk add --no-cache \
         libpq-dev \
         openldap-dev \
         zlib-dev \
+        libjpeg-turbo-dev \
+        libwebp-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) pdo pdo_pgsql pgsql ldap gd zip opcache \
     && apk del .build-deps
 
