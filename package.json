@@ -30,8 +30,10 @@
     },
     "dependencies": {
         "@inertiajs/react": "^3.6.1",
+        "@mantine/carousel": "^9.6.0",
         "@mantine/core": "^9.6.0",
         "@mantine/hooks": "^9.6.0",
+        "@mantine/lightbox": "^9.6.0",
         "@mantine/modals": "^9.5.1",
         "@mantine/notifications": "^9.5.1",
         "@mantine/tiptap": "^9.6.0",
@@ -46,10 +48,15 @@
         "@tiptap/react": "^3.31.3",
         "@tiptap/starter-kit": "^3.31.3",
         "@vitejs/plugin-react": "^6.0.5",
+        "antd": "^6.6.5",
         "dayjs": "^1.11.23",
+        "embla-carousel": "^8.6.0",
+        "embla-carousel-react": "^8.6.0",
+        "lucide-react": "^1.47.0",
         "mantine-datatable": "^9.4.0",
         "react": "^19.2.8",
         "react-dom": "^19.2.8",
-        "ziggy-js": "^2.6.3"
+        "ziggy-js": "^2.6.3",
+        "zustand": "^5.0.15"
     }
 }
