@@ -1,23 +1,11 @@
 import "../css/app.css";
-import "@mantine/core/styles.css";
-import 'mantine-datatable/styles.layer.css';
-import '@mantine/notifications/styles.css';
-import '@mantine/tiptap/styles.css';
-
 import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
-import { MantineProvider, createTheme } from "@mantine/core";
-import MainLayout from "./layouts/MainLayout";
+import { MainLayout } from "./Layout/MainLayout";
+import { ConfigProvider } from "antd";
+import ruRU from "antd/locale/ru_RU";
 
-const theme = createTheme({
-  primaryColor: "blue",
-  defaultRadius: "md",
-  fontFamily: "'Golos Text', system-ui, -apple-system, sans-serif",
-  headings: {
-    fontWeight: "500",
-  },
-});
 
 createInertiaApp({
   title: (title) => title,
@@ -40,9 +28,17 @@ createInertiaApp({
     const root = createRoot(el);
 
     root.render(
-      <MantineProvider theme={theme} defaultColorScheme="dark">
+      <ConfigProvider
+        locale={ruRU}
+        theme={{
+          token: {
+            colorBgLayout: '#ffffff',
+            fontFamily: "'Golos Text', system-ui, -apple-system, sans-serif",
+          },
+        }}
+      >
         <App {...props} />
-      </MantineProvider>,
+      </ConfigProvider>
     );
   },
   progress: {
