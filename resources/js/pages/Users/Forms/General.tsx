@@ -1,6 +1,7 @@
-import { Button, Stack, TextInput } from "@mantine/core";
-import { Form as FormInertia } from '@inertiajs/react';
+import { Button, Form, Input, Space, Form as AntdForm } from "antd";
 import { Role, User, UserLabels } from "../types";
+import { Form as FormInertia } from "@inertiajs/react";
+import { useEffect } from "react";
 
 type FormProps = {
   user?: User;
@@ -10,75 +11,50 @@ type FormProps = {
 };
 
 export default function FormGeneral({ user, labels, onSuccess }: FormProps): React.JSX.Element {
-  const formAction = user === undefined ? route('users.store') : route('users.update', { id: user.id });
-  const formMethod = user === undefined ? 'POST': 'PUT';
+  const [antdForm] = AntdForm.useForm();
+  useEffect(() => {
+    if (user) {
+      antdForm.setFieldsValue(user);
+    } else {
+      antdForm.resetFields();
+    }
+  }, [user, antdForm]);
 
-  return (<>
-    <FormInertia action={formAction} method={formMethod} onSuccess={onSuccess}>
+  const formAction = user === undefined ? route("users.store") : route("users.update", { id: user.id });
+  const formMethod = user === undefined ? "POST" : "PUT";
+
+  const attributes: (keyof Omit<User, "roles">)[] = ["login", "name", "email", "company", "department", "position", "telephone", "torm_code"];
+
+  return (
+    <FormInertia
+      action={formAction}
+      method={formMethod}
+      onSuccess={onSuccess}
+    >
       {({ errors, processing }) => (
-        <Stack gap={10}>
-          <TextInput
-            label={labels.login}
-            placeholder={labels.login}
-            name="login"
-            defaultValue={user?.login}
-            error={errors?.login}
-          />
-          <TextInput
-            label={labels.name}
-            placeholder={labels.name}
-            name="name"
-            defaultValue={user?.name}
-            error={errors?.name}
-          />
-          <TextInput
-            label={labels.email}
-            placeholder={labels.email}
-            name="email"
-            defaultValue={user?.email}
-            error={errors?.email}
-          />
-          <TextInput
-            label={labels.company}
-            placeholder={labels.company}
-            name="company"
-            defaultValue={user?.company}
-            error={errors?.company}
-          />
-          <TextInput
-            label={labels.department}
-            placeholder={labels.department}
-            name="department"
-            defaultValue={user?.department}
-            error={errors?.department}
-          />
-          <TextInput
-            label={labels.position}
-            placeholder={labels.position}
-            name="position"
-            defaultValue={user?.position}
-            error={errors?.position}
-          />
-          <TextInput
-            label={labels.telephone}
-            placeholder={labels.telephone}
-            name="telephone"
-            defaultValue={user?.telephone}
-            error={errors?.telephone}
-          />
-          <TextInput
-            label={labels.torm_code}
-            placeholder={labels.torm_code}
-            name="torm_code"
-            defaultValue={user?.torm_code}
-            error={errors?.torm_code}
-          />
+        <AntdForm form={antdForm} layout="vertical" component="div" requiredMark={false}>
+          <Space orientation="vertical" size={0} style={{ display: "flex" }}>
+            {attributes.map((attribute) => (
+              <Form.Item
+                key={attribute}
+                label={labels[attribute]}
+                validateStatus={errors[attribute] ? "error" : ""}
+                help={errors[attribute]}
+              >
+                <Input
+                  placeholder={labels[attribute]}
+                  name={attribute}
+                  defaultValue={user ? user[attribute] : ""}
+                />
+              </Form.Item>
+            ))}
 
-          <Button loading={processing} type="submit" mt="lg">
-            Сохранить
-          </Button>
-        </Stack>
+            <Button loading={processing} type="primary" htmlType="submit">
+              Сохранить
+            </Button>
+          </Space>
+        </AntdForm>
       )}
     </FormInertia>
-  </>);
-};
+  );
+}
