@@ -1,4 +1,4 @@
-import { Button, Form, Input, Space, Form as AntdForm } from "antd";
+import { Button, Input, Space, Form as AntdForm } from "antd";
 import { Role, User, UserLabels } from "../types";
 import { Form as FormInertia } from "@inertiajs/react";
 import { useEffect } from "react";
@@ -35,7 +35,7 @@ export default function FormGeneral({ user, labels, onSuccess }: FormProps): Rea
         <AntdForm form={antdForm} layout="vertical" component="div" requiredMark={false}>
           <Space orientation="vertical" size={0} style={{ display: "flex" }}>
             {attributes.map((attribute) => (
-              <Form.Item
+              <AntdForm.Item
                 key={attribute}
                 label={labels[attribute]}
                 validateStatus={errors[attribute] ? "error" : ""}
@@ -46,7 +46,7 @@ export default function FormGeneral({ user, labels, onSuccess }: FormProps): Rea
                   name={attribute}
                   defaultValue={user ? user[attribute] : ""}
                 />
-              </Form.Item>
+              </AntdForm.Item>
             ))}
 
             <Button loading={processing} type="primary" htmlType="submit">
