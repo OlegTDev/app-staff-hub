@@ -20,6 +20,7 @@ return new class extends Migration
             $table->json('services')->default('[]');
             $table->json('medical_profiles')->default('[]');
             $table->text('description')->nullable();
+            $table->string('photo_thumbnail', 250)->nullable();
 
             $table->timestamps();
             $table->softDeletes();

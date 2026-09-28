@@ -30,6 +30,7 @@ class SanatoriumRequest extends FormRequest
             'services' => ['array', 'nullable'],
             'medical_profiles' => ['array', 'nullable'],
             'description' => ['string', 'nullable'],
+            'photo_thumbnail' => ['image', 'nullable'],
             'images' => ['array', 'nullable'],
             'images.*' => ['image'],
         ];
