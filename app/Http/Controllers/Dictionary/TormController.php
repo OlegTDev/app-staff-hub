@@ -16,7 +16,7 @@ class TormController extends Controller
     use BuildsListQuery;
 
     /**
-     * @route GET /dictionary/torm
+     * @route GET /dictionary/torms
      */
     public function index(Request $request): \Inertia\Response
     {
@@ -42,6 +42,12 @@ class TormController extends Controller
     {
         $torm->update($request->validated());
         return back()->with('success', 'Запись успешно обновлена');
+    }
+
+    public function destroy(Torm $torm): RedirectResponse
+    {
+        $torm->delete();
+        return back()->with('success', 'Запись успешно удалена');
     }
 
 }
