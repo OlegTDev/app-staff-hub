@@ -3,6 +3,7 @@ import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAuth } from "@/hooks/useAuth";
 import { router } from "@inertiajs/react";
 import { ItemType } from "antd/es/menu/interface";
+import Breadcrumbs from "@/Shared/Breadcrumbs";
 
 const { Header: AntHeader } = Layout;
 
@@ -39,7 +40,7 @@ export function Header() {
       }}
     >
       <Flex align="center" flex={1} style={{ minWidth: 0 }}>
-        Breadcrumb
+        <Breadcrumbs />
       </Flex>
       <Space>
         <Dropdown menu={{ items: userMenuItems }}>
