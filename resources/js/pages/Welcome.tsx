@@ -1,19 +1,20 @@
-import { Text, Button, Card, Title } from '@mantine/core';
+import { usePageBreadcrumbs } from "@/hooks/usePageBreadcrumbs";
+import Title from "@/Shared/Title";
+import { Head } from "@inertiajs/react";
 
-export default function Welcome() {
+const title = 'Главная';
+
+export default function Welcome(): React.JSX.Element {
+  usePageBreadcrumbs([
+    { title },
+  ]);
+
   return (
     <>
-      <Title order={1} mb="lg">Добро пожаловать в систему!</Title>
+      <Head title={title} />
+      <Title level={2} text={title} />
 
-      <Card shadow="sm" padding="lg" radius="md" withBorder style={{ maxWidth: 400 }}>
-        <Text fw={700} size="lg">Mantine + Inertia работает!</Text>
-        <Text size="sm" c="dimmed" mt="xs" mb="md">
-          Интерфейс успешно скомпилирован. Вы можете использовать любые компоненты из экосистемы Mantine.
-        </Text>
-        <Button color="blue" fullWidth>
-          Посмотреть картриджи
-        </Button>
-      </Card>
+      {title}
     </>
   );
 }
