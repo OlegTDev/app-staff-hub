@@ -9,7 +9,7 @@ require __DIR__ . '/web/auth.php';
 Route::middleware('auth')->group(static function() {
     Route::get('/', static function () {
         return Inertia::render('Welcome');
-    });
+    })->name('main');
 
     require __DIR__ . '/web/users.php';
     require __DIR__ . '/web/roles.php';
