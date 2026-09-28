@@ -27,3 +27,4 @@ Homestead.yaml
 Thumbs.db
 /resources/js/ziggy.*
 coverage.xml
+.php-cs-fixer.cache
