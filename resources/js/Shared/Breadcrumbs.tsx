@@ -1,13 +1,14 @@
 import { useBreadcrumbsStore } from '@/stores/breadcrumbs';
 import { Link } from '@inertiajs/react';
 import { Breadcrumb } from 'antd';
+import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
 
 
 export default function Breadcrumbs(): React.JSX.Element {
   const items = useBreadcrumbsStore((store) => store.items).map((item) => ({ title: item.title, href: item.href }));
 
-  const itemRender = (currentRoute: any, items: any[]) => {
-    const isLast = items.indexOf(currentRoute) === items.length - 1;
+  const itemRender = (currentRoute: ItemType, _: any, routes: ItemType[]) => {
+    const isLast = routes.indexOf(currentRoute) === routes.length - 1;
 
     if (isLast) {
       return <span>{currentRoute.title}</span>;
