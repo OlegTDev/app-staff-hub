@@ -24,7 +24,7 @@ class RoleRequest extends FormRequest
     {
         return [
             'roles' => ['array'],
-            'roles.*' => ['string'],
+            'roles.*' => ['numeric'],
         ];
     }
 }
