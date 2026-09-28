@@ -1,168 +1,207 @@
-import { ActionIcon, Badge, Button, Center, Drawer, Group, Stack, TextInput, Title, Tooltip } from "@mantine/core";
-import { DataTable, DataTableColumn } from "mantine-datatable";
+import { Space, Table, Tag, TableProps, Button, Input, Drawer, Tooltip, Flex, Modal } from "antd";
 import { Role, User, UserLabels } from "./types";
-import { Head, router } from "@inertiajs/react";
+import { ColumnsType } from "antd/es/table";
+import { EditOutlined, DeleteOutlined, UsergroupAddOutlined } from "@ant-design/icons";
 import { BaseFilters, PaginatedData } from "@/types/pagination";
 import { useDataTable } from "@/hooks/useDataTable";
-import { IconClick, IconEditCircle, IconTrash, IconUsers } from "@tabler/icons-react";
-import { modals } from "@mantine/modals";
 import { formatDate } from "@/utils/dateHelpers";
-import { useDisclosure } from "@mantine/hooks";
-import { useCallback, useState } from "react";
+import Title from "@/Shared/Title";
+import { Head, router } from "@inertiajs/react";
+import { useState } from "react";
 import FormGeneral from "./Forms/General";
 import FormRoles from "./Forms/Roles";
 
-type PageProps = {
+
+interface PageProps {
   items: PaginatedData<User>;
   query: BaseFilters;
   labels: UserLabels;
   roles: Role[];
 };
 
-const title = 'Пользователи';
+interface TableHeaderProps {
+  table: ReturnType<typeof useDataTable<User>>;
+  handleCreateClick: () => void;
+}
+const TableHeader = ({ table, handleCreateClick }: TableHeaderProps) => {
+  return (
+    <Flex justify="space-between">
+      <Button onClick={handleCreateClick} type="primary">Добавить</Button>
+      <Input.Search
+        placeholder="Поиск..."
+        allowClear
+        style={{ maxWidth: 400 }}
+        enterButton={<Button type="default">Найти</Button>}
+        loading={table.loading}
+        defaultValue={table.search}
+        onSearch={(value) => table.handleSearchChange(value)}
+        onChange={(e) => {
+          if (!e.target.value) {
+            table.handleSearchChange('');
+          }
+        }}
+      />
+    </Flex>
+  );
+};
 
 export default function Index({ items, query, labels, roles }: PageProps): React.JSX.Element {
+  const title = 'Пользователи';
+  const [selectedUser, setSelectedUser] = useState<User|undefined>();
+  const [openGeneral, setOpenGeneral] = useState(false);
+  const [openRoles, setOpenRoles] = useState(false);
+  const { confirm } = Modal;
+
   const table = useDataTable<User>({
     routeName: route('users.index'),
     items,
     query,
   });
 
-  const [openedGeneral, { open: openGeneral, close: closeGeneral }] = useDisclosure(false);
-  const [openedRoles, { open: openRoles, close: closeRoles }] = useDisclosure(false);
-  const [selectedUser, setSelectedUser] = useState<User|undefined>();
+  const handleDeleteUser = (user: User) => {
+    confirm({
+      title: 'Удаление пользователя',
+      icon: <DeleteOutlined />,
+      content: 'Вы уверены, что хотите удалить пользователя?',
+      onOk() {
+        router.delete(route('users.destroy', { id: user.id }));
+      },
+    });
+  };
+
+  const columns: ColumnsType<User> = [
+    {
+      title: labels.id,
+      dataIndex: 'id',
+    },
+    {
+      title: labels.login,
+      dataIndex: 'login',
+      sorter: true,
+    },
+    {
+      title: labels.name,
+      dataIndex: 'name',
+      sorter: true,
+    },
+    {
+      title: labels.department,
+      dataIndex: 'department',
+      sorter: true,
+    },
+    {
+      title: labels.position,
+      dataIndex: 'position',
+      sorter: true,
+    },
+    {
+      title: labels.roles,
+      key: 'roles',
+      render: (record: User) => (
+        <Space orientation="vertical">
+          { record.roles.map((role: Role) => (<Tag color="blue" key={role.id}>{role.name}</Tag>)) }
+        </Space>
+      ),
+    },
+    {
+      title: labels.email,
+      dataIndex: 'email',
+      sorter: true,
+    },
+    {
+      title: labels.created_at,
+      dataIndex: 'created_at',
+      sorter: true,
+      render: (value: string) => {
+        return formatDate(value);
+      },
+    },
+    {
+      title: 'Управление',
+      render: (record: User) => (
+        <Space>
+          <Tooltip title="Редактирование основной информации пользователя">
+            <Button icon={<EditOutlined />} onClick={() => { setSelectedUser(record); setOpenGeneral(true); }} />
+          </Tooltip>
+          <Tooltip title="Редактирование ролей пользователя">
+            <Button icon={<UsergroupAddOutlined />} onClick={() => { setSelectedUser(record); setOpenRoles(true); }} />
+          </Tooltip>
+          <Tooltip title="Удалить пользователя" color="red">
+            <Button icon={<DeleteOutlined />} danger onClick={() => handleDeleteUser(record)} />
+          </Tooltip>
+        </Space>
+      ),
+      width: 85,
+    },
+  ];
+
+  const handleTableChange: TableProps<User>['onChange'] = (pagination, _, sorter, extra) => {
+    if (extra.action === 'paginate') {
+      if (pagination.current !== undefined) {
+        table.setPage(pagination.current);
+      }
+    }
+
+    if (extra.action === 'sort') {
+      if (!Array.isArray(sorter)) {
+        table.setSortStatus({
+          column: sorter.field?.toString(),
+          direction: sorter.order !== undefined ? (sorter.order === 'ascend' ? 'asc' : 'desc') : undefined,
+        });
+      }
+    }
+  };
 
   const handleCreateClick = () => {
     setSelectedUser(undefined);
-    openGeneral();
+    setOpenGeneral(true);
   };
-
-  const handleEditClick = (user: User) => {
-    setSelectedUser(user);
-    openGeneral();
-  };
-
-  const handleRolesClick = (user: User) => {
-    setSelectedUser(user);
-    openRoles();
-  };
-
-  const renderActions: DataTableColumn<User>['render'] = useCallback((record) => (
-    <Group gap={4} justify="right" wrap="nowrap">
-      <ActionIcon
-        size="sm"
-        variant="transparent"
-        color="green"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleEditClick(record);
-        }}
-      >
-        <Tooltip label="Редактирование основной информации пользователя">
-          <IconEditCircle size={16} />
-        </Tooltip>
-      </ActionIcon>
-      <ActionIcon
-        size="sm"
-        variant="transparent"
-        color="green"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleRolesClick(record);
-        }}
-      >
-        <Tooltip label="Редактирование ролей пользователя">
-          <IconUsers size={16} />
-        </Tooltip>
-      </ActionIcon>
-      <ActionIcon
-        size="sm"
-        variant="transparent"
-        color="red"
-        onClick={(e) => {
-          e.stopPropagation();
-          modals.openConfirmModal({
-            title: 'Удаление пользователя',
-            children: 'Вы уверены, что хотите удалить пользователя?',
-            labels: { confirm: 'Удалить', cancel: 'Отмена' },
-            confirmProps: { color: 'red' },
-            onConfirm: () => router.delete(route('users.destroy', { id: record.id })),
-          });
-        }}
-      >
-        <IconTrash size={16} />
-      </ActionIcon>
-    </Group>
-  ), []);
 
   const onSuccessGeneral = () => {
-    closeGeneral();
+    setOpenGeneral(false);
   };
 
   const onSuccessRoles = () => {
-    closeRoles();
+    setOpenRoles(false);
   };
 
+  return (
+    <>
+      <Drawer
+        title={selectedUser ? 'Редактировать пользователя' : 'Добавить пользователя'}
+        open={openGeneral}
+        onClose={() => { setOpenGeneral(false); setSelectedUser(undefined); }}
+        destroyOnHidden
+      >
+        <FormGeneral labels={labels} user={selectedUser} roles={roles} onSuccess={onSuccessGeneral} />
+      </Drawer>
+      <Drawer
+        title="Роли"
+        open={openRoles}
+        onClose={() => { setOpenRoles(false); setSelectedUser(undefined); }}
+        destroyOnHidden
+      >
+        {selectedUser && (
+          <FormRoles idUser={selectedUser.id} roles={roles} userRoles={selectedUser?.roles ? selectedUser.roles : []} onSuccess={onSuccessRoles} />
+        )}
+      </Drawer>
 
-  return <>
-    <Drawer opened={openedGeneral} onClose={closeGeneral} title={selectedUser ? 'Редактировать пользователя' : 'Добавить пользователя'}>
-      <FormGeneral labels={labels} user={selectedUser} roles={roles} onSuccess={onSuccessGeneral} />
-    </Drawer>
-
-    <Drawer opened={openedRoles} onClose={closeRoles} title="Роли">
-      {selectedUser && (
-        <FormRoles idUser={selectedUser.id} roles={roles} userRoles={selectedUser?.roles ? selectedUser.roles : []} onSuccess={onSuccessRoles} />
-      )}
-    </Drawer>
-
-    <Head title={title} />
-
-    <Title order={1}>{title}</Title>
-
-    <TextInput
-      placeholder="Поиск..."
-      value={table.search}
-      onChange={(e) => table.handleSearchChange(e.target.value)}
-      mb="md"
-    />
-
-    <Button type="button" mb="md" onClick={handleCreateClick}>
-      Добавить
-    </Button>
-
-    <DataTable<User>
-      withTableBorder
-      records={table.records}
-      columns={[
-        { accessor: 'id', title: labels.id, sortable: false, width: 70 },
-        { accessor: 'login', title: labels.login, sortable: true },
-        { accessor: 'name', title: labels.name, sortable: true },
-        { accessor: 'department', title: labels.department, sortable: true },
-        { accessor: 'position', title: labels.position, sortable: true },
-        {
-          accessor: 'roles',
-          title: labels.roles,
-          render: (record: User) => (
-            <Stack gap="xs">
-              { record.roles.map((role: Role) => (<Badge key={role.id}>{role.name}</Badge>)) }
-            </Stack>
-          ),
-        },
-        { accessor: 'email', title: labels.email, sortable: true },
-        { accessor: 'created_at', title: labels.created_at, sortable: true,
-          render: (record: User) => {
-            return formatDate(record.created_at);
-          }
-         },
-        { accessor: 'actions', title: (<Center><IconClick size={16} /></Center>), render: renderActions },
-      ]}
-      fetching={table.loading}
-      totalRecords={table.totalRecords}
-      recordsPerPage={table.perPage}
-      page={table.page}
-      onPageChange={table.setPage}
-      sortStatus={table.sortStatus}
-      onSortStatusChange={table.setSortStatus}
-    />
-  </>;
+      <Head title={title} />
+      <Title level={2} text={title} />
+      <Table<User>
+        columns={columns}
+        rowKey={(record) => record.id}
+        dataSource={items.data}
+        pagination={{
+          current: items.current_page,
+          pageSize: items.per_page,
+          total: items.total,
+        }}
+        loading={table.loading}
+        onChange={handleTableChange}
+        bordered
+        title={() => <TableHeader handleCreateClick={handleCreateClick} table={table} />}
+      />
+    </>
+  );
 }

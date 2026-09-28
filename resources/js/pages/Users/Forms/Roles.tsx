@@ -1,7 +1,7 @@
-import { Button, Card, Checkbox, Stack } from "@mantine/core";
-import { Form as FormInertia } from '@inertiajs/react';
-import { useState } from "react";
+import { useForm } from "@inertiajs/react";
+import { useEffect } from "react";
 import { Role } from "../types";
+import { Button, Checkbox, Space, Form as AntdForm } from "antd";
 
 type FormProps = {
   idUser: number;
@@ -11,41 +11,50 @@ type FormProps = {
 };
 
 export default function FormRoles({ idUser, roles, userRoles, onSuccess }: FormProps): React.JSX.Element {
-  const url = route('users.roles.update', { user: idUser });
-  const [selectedRoles, setSelectedRoles] = useState<string[]>(Object.values(userRoles).map((role) => role.name));
+  const [antdForm] = AntdForm.useForm();
 
-  const toggleRoles = (roleName: string) => {
-    setSelectedRoles((prevValue) =>
-      prevValue.includes(roleName) ? prevValue.filter(r => r !== roleName) : [...prevValue, roleName]
-    );
+  const { setData, put, processing, isDirty } = useForm({
+    roles: userRoles.map((role) => role.id),
+  });
+
+  useEffect(() => {
+    const currentRoleIds = userRoles.map((role) => role.id);
+    antdForm.setFieldsValue({ roles: currentRoleIds });
+    setData('roles', currentRoleIds);
+  }, [userRoles, antdForm]);
+
+  const handleSubmit = () => {
+    const url = route("users.roles.update", { user: idUser });
+    put(url, { onSuccess });
   };
 
-  return (<>
-    <FormInertia action={url} method="PUT" onSuccess={onSuccess}>
-      {({ errors, processing }) => (
-        <>
-          {console.log(errors)}
-          <Card withBorder>
-            <Stack gap={10} pt={10}>
-              {roles.map((role: Role) => (
-                  <Checkbox
-                    key={role.id}
-                    name="roles[]"
-                    label={role.description ? `${role.description} (${role.name})` : role.name}
-                    checked={selectedRoles.includes(role.name)}
-                    defaultValue={role.id}
-                    onChange={() => toggleRoles(role.name)}
-                    error={errors?.roles}
-                  />
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+      <AntdForm
+        form={antdForm}
+        layout="vertical"
+        component="div"
+      >
+        <Space orientation="vertical" size={24} style={{ width: "100%" }}>
+          <AntdForm.Item name="roles" style={{ margin: 0 }}>
+            <Checkbox.Group
+              style={{ width: "100%" }}
+              onChange={(checkedValues) => setData('roles', checkedValues)}
+            >
+              <Space orientation="vertical" style={{ width: "100%" }}>
+                {roles.map((role: Role) => (
+                  <Checkbox key={role.id} value={role.id}>
+                    {role.description ? `${role.description} (${role.name})` : role.name}
+                  </Checkbox>
                 ))}
-              </Stack>
-          </Card>
-
-          <Button loading={processing} type="submit" mt="lg">
-            Сохранить
+              </Space>
+            </Checkbox.Group>
+          </AntdForm.Item>
+          <Button loading={processing} type="primary" htmlType="submit" block disabled={!isDirty}>
+            Сохранить изменения
           </Button>
-        </>
-      )}
-    </FormInertia>
-  </>);
-};
+        </Space>
+      </AntdForm>
+    </form>
+  );
+}

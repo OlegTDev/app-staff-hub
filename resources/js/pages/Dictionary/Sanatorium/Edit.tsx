@@ -1,8 +1,8 @@
 import { Head } from "@inertiajs/react";
 import { Sanatorium, SanatoriumLabels } from "./types";
-import Breadcrumbs from "@/Shared/Breadcrumbs";
-import { Title } from "@mantine/core";
+// import Breadcrumbs from "@/Shared/Breadcrumbs";
 import Form from "./Form";
+import Title from "@/Shared/Title";
 
 type PageProps = {
   sanatorium: Sanatorium;
@@ -16,12 +16,12 @@ export default function Edit({ sanatorium, labels }: PageProps): React.JSX.Eleme
     <>
       <Head title={title} />
 
-      <Breadcrumbs items={[
+      {/* <Breadcrumbs items={[
         { title: 'Санатории', href: route('dictionary.sanatoriums.index') },
         { title: title },
-      ]} />
+      ]} /> */}
 
-      <Title order={1}>{title}</Title>
+      <Title level={2} text={title} />
 
       <Form
         model={sanatorium}

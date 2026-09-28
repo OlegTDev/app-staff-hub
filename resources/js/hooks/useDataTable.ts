@@ -1,6 +1,5 @@
 import { BaseFilters, PaginatedData } from "@/types/pagination";
 import { router } from "@inertiajs/react";
-import { DataTableSortStatus } from "mantine-datatable";
 import { useEffect, useState } from "react";
 
 interface UseDataTableOptions<T> {
@@ -9,13 +8,18 @@ interface UseDataTableOptions<T> {
   query: BaseFilters;
 }
 
+export type SortType = {
+  column?: string;
+  direction?: 'asc'|'desc';
+};
+
 export function useDataTable<T>({ routeName, items, query }: UseDataTableOptions<T>) {
   const [page, setPage] = useState(items.current_page);
   const [perPage, setPerPage] = useState(items.per_page);
   const [search, setSearch] = useState(query?.search || '');
   const [loading, setLoading] = useState(false);
-  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<any>>({
-    columnAccessor: query?.sortField || 'id',
+  const [sortStatus, setSortStatus] = useState<SortType>({
+    column: query?.sortField || 'id',
     direction: (query?.sortDirection as 'asc' | 'desc') || 'asc',
   });
 
@@ -29,7 +33,7 @@ export function useDataTable<T>({ routeName, items, query }: UseDataTableOptions
       page === items.current_page &&
       perPage === items.per_page &&
       search === backendSearch &&
-      sortStatus.columnAccessor === backendSortField &&
+      sortStatus.column === backendSortField &&
       sortStatus.direction === backendSortDirection;
 
     if (isSame) return;
@@ -43,7 +47,7 @@ export function useDataTable<T>({ routeName, items, query }: UseDataTableOptions
           page,
           perPage,
           search,
-          sortField: sortStatus.columnAccessor as string,
+          sortField: sortStatus.column,
           sortDirection: sortStatus.direction,
         },
         {
@@ -58,7 +62,7 @@ export function useDataTable<T>({ routeName, items, query }: UseDataTableOptions
     return () => {
       clearTimeout(delayDebounce);
       setLoading(false);
-    }
+    };
   }, [page, perPage, search, sortStatus, routeName]);
 
   const handleSearchChange = (value: string) => {

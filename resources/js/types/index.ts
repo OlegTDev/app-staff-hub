@@ -8,6 +8,7 @@ export interface PageProps extends InertiaPageProps {
   flash: {
     success: string | null;
     error: string | null;
+    warning: string | null;
   };
   appName: string;
   [key: string]: unknown;

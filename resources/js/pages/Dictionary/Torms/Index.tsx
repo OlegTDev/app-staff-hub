@@ -1,23 +1,50 @@
-import { Head } from "@inertiajs/react";
-import { ActionIcon, Button, Center, Drawer, Group, Title, Tooltip } from "@mantine/core";
-import { DataTable, DataTableColumn } from "mantine-datatable";
+import { Head, router } from "@inertiajs/react";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Torm, TormLabels } from "./types";
 import { BaseFilters, PaginatedData } from "@/types/pagination";
 import { useDataTable } from "@/hooks/useDataTable";
 import { formatDate } from "@/utils/dateHelpers";
-import { IconClick, IconEditCircle } from "@tabler/icons-react";
-import { useCallback, useState } from "react";
-import { useDisclosure } from "@mantine/hooks";
+import { useState } from "react";
+import Title from "@/Shared/Title";
+import { Button, Modal, Space, Tooltip, Table, Flex, Input, Drawer, TableProps } from "antd";
+import { ColumnsType } from "antd/es/table";
 import Form from "./Form";
 
 const title = 'Список ТОРМ';
 
-type PageProps = {
+
+interface TableHeaderProps {
+  table: ReturnType<typeof useDataTable<Torm>>;
+  handleCreateClick: () => void;
+}
+const TableHeader = ({ table, handleCreateClick }: TableHeaderProps) => {
+  return (
+    <Flex justify="space-between">
+      <Button onClick={handleCreateClick} type="primary">Добавить</Button>
+      <Input.Search
+        placeholder="Поиск..."
+        allowClear
+        style={{ maxWidth: 400 }}
+        enterButton={<Button type="default">Найти</Button>}
+        loading={table.loading}
+        defaultValue={table.search}
+        onSearch={(value) => table.handleSearchChange(value)}
+        onChange={(e) => {
+          if (!e.target.value) {
+            table.handleSearchChange('');
+          }
+        }}
+      />
+    </Flex>
+  );
+};
+
+
+interface PageProps {
   items: PaginatedData<Torm>;
   query: BaseFilters;
   labels: TormLabels;
 };
-
 export default function Index({ items, query, labels }: PageProps): React.JSX.Element {
 
   const table = useDataTable<Torm>({
@@ -27,77 +54,114 @@ export default function Index({ items, query, labels }: PageProps): React.JSX.El
   });
 
   const [selectedTorm, setSelectedTorm] = useState<Torm|undefined>();
-  const [openedDrawer, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
+  const [openForm, setOpenForm] = useState(false);
+  const { confirm } = Modal;
 
   const handleCreateClick = () => {
     setSelectedTorm(undefined);
-    openDrawer();
+    setOpenForm(true);
   };
 
-  const handleEditClick = (torm: Torm) => {
-    setSelectedTorm(torm);
-    openDrawer();
+  const handleDeleteUser = (torm: Torm) => {
+    confirm({
+      title: 'Удаление ТОРМ',
+      icon: <DeleteOutlined />,
+      content: 'Вы уверены, что хотите удалить ТОРМ?',
+      onOk() {
+        router.delete(route('dictionary.torms.destroy', { id: torm.id }));
+      },
+    });
   };
 
-  const renderActions: DataTableColumn<Torm>['render'] = useCallback((record) => (
-     <Group gap={4} justify="right" wrap="nowrap">
-      <ActionIcon
-        size="sm"
-        variant="transparent"
-        color="green"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleEditClick(record);
-        }}
-      >
-        <Tooltip label="Редактирование">
-          <IconEditCircle size={16} />
-        </Tooltip>
-      </ActionIcon>
-     </Group>
-  ), []);
+  const handleTableChange: TableProps<Torm>['onChange'] = (pagination, _, sorter, extra) => {
+    if (extra.action === 'paginate') {
+      if (pagination.current !== undefined) {
+        table.setPage(pagination.current);
+      }
+    }
+
+    if (extra.action === 'sort') {
+      if (!Array.isArray(sorter)) {
+        table.setSortStatus({
+          column: sorter.field?.toString(),
+          direction: sorter.order !== undefined ? (sorter.order === 'ascend' ? 'asc' : 'desc') : undefined,
+        });
+      }
+    }
+  };
+
+  const columns: ColumnsType<Torm> = [
+    {
+      title: labels.id,
+      dataIndex: 'id',
+    },
+    {
+      title: labels.code,
+      dataIndex: 'code',
+      sorter: true,
+    },
+    {
+      title: labels.name,
+      dataIndex: 'name',
+      sorter: true,
+    },
+    {
+      title: labels.created_at,
+      dataIndex: 'created_at',
+      sorter: true,
+      render: (value: string) => {
+        return formatDate(value);
+      },
+    },
+    {
+      title: 'Управление',
+      render: (record: Torm) => (
+        <Space>
+          <Tooltip title="Редактирование">
+            <Button icon={<EditOutlined />} onClick={() => { setSelectedTorm(record); setOpenForm(true); }} />
+          </Tooltip>
+          <Tooltip title="Удалить" color="red">
+            <Button icon={<DeleteOutlined />} danger onClick={() => handleDeleteUser(record)} />
+          </Tooltip>
+        </Space>
+      ),
+      width: 85,
+    },
+  ];
 
   return <>
-    <Head title={title} />
-
-    <Title order={1}>{title}</Title>
-
-    <Button type="button" mb="md" onClick={handleCreateClick}>
-      Добавить
-    </Button>
-
-    <Drawer opened={openedDrawer} onClose={closeDrawer} title={selectedTorm ? 'Редактировать ТОРМ' : 'Добавить ТОРМ'}>
+    <Drawer
+      title={selectedTorm ? 'Редактировать ТОРМ' : 'Добавить ТОРМ'}
+      open={openForm}
+      onClose={() => { setOpenForm(false); setSelectedTorm(undefined); }}
+      destroyOnHidden
+    >
       <Form
         torm={selectedTorm}
         labels={labels}
-        onSuccess={closeDrawer}
+        onSuccess={() => setOpenForm(false)}
         route={selectedTorm ? route('dictionary.torms.update', { torm: selectedTorm.id }) : route('dictionary.torms.store')}
         method={selectedTorm ? 'PUT' : 'POST'}
       />
     </Drawer>
 
-    <DataTable<Torm>
-      withTableBorder
-      records={table.records}
-      columns={[
-        { accessor: 'id', title: labels.id, sortable: false, width: 70 },
-        { accessor: 'code', title: labels.code, sortable: true },
-        { accessor: 'name', title: labels.name, sortable: true },
-        { accessor: 'created_at', title: labels.created_at, sortable: false,
-          render: (record: Torm) => {
-            return formatDate(record.created_at);
-          }
-         },
-        { accessor: 'actions', title: (<Center><IconClick size={16} /></Center>), render: renderActions },
-      ]}
-      fetching={table.loading}
-      totalRecords={table.totalRecords}
-      recordsPerPage={table.perPage}
-      page={table.page}
-      onPageChange={table.setPage}
-      sortStatus={table.sortStatus}
-      onSortStatusChange={table.setSortStatus}
-    />
+    <Head title={title} />
 
-  </>
+    <Title level={2} text={title} />
+
+    <Table<Torm>
+      columns={columns}
+      rowKey={(record) => record.id}
+      dataSource={items.data}
+      pagination={{
+        current: items.current_page,
+        pageSize: items.per_page,
+        total: items.total,
+      }}
+      loading={table.loading}
+      onChange={handleTableChange}
+      bordered
+      title={() => <TableHeader handleCreateClick={handleCreateClick} table={table} />}
+    />
+  </>;
 };
