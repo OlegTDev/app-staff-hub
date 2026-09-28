@@ -43,6 +43,8 @@ export default [
       },
     },
     rules: {
+      'no-console': 'error',
+      'indent': ['warn', 2],
       'semi': ['warn', 'always'],
       'react/require-default-props': 'off',
       'react/react-in-jsx-scope': 'off',
