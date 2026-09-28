@@ -1,19 +1,40 @@
+import { useBreadcrumbsStore } from '@/stores/breadcrumbs';
 import { Link } from '@inertiajs/react';
-import { Breadcrumbs as BreadcrumbsMantine, Paper } from '@mantine/core';
+import { Breadcrumb } from 'antd';
 
-type PageProps = {
-  items: Array<{
-    title: string;
-    href?: string;
-  }>;
-};
 
-export default function Breadcrumbs({ items }: PageProps): React.JSX.Element {
-  const elements = items.map((item, index) => (
-    item.href ? <Link href={item.href} key={index}>{item.title}</Link> : item.title
-  ));
+export default function Breadcrumbs(): React.JSX.Element {
+  const items = useBreadcrumbsStore((store) => store.items).map((item) => ({ title: item.title, href: item.href }));
 
-  return <Paper p={10} mb={10}>
-     <BreadcrumbsMantine>{elements}</BreadcrumbsMantine>
-  </Paper>;
+  const itemRender = (currentRoute: any, items: any[]) => {
+    const isLast = items.indexOf(currentRoute) === items.length - 1;
+
+    if (isLast) {
+      return <span>{currentRoute.title}</span>;
+    }
+
+    if (currentRoute.href) {
+      return (
+        <Link
+          href={currentRoute.href}
+          style={{ color: 'inherit' }}
+        >
+          {currentRoute.title}
+        </Link>
+      );
+    }
+
+    return <span>{currentRoute.title}</span>;
+  };
+
+  return (
+    <div className="app-header">
+      {items.length > 0 && (
+        <Breadcrumb
+          items={items}
+          itemRender={itemRender}
+        />
+      )}
+    </div>
+  );
 }
