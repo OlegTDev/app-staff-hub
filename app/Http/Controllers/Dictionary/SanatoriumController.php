@@ -8,6 +8,7 @@ use App\Http\Requests\SanatoriumRequest;
 use App\Http\Resources\SanatoriumResource;
 use App\Models\Dictionary\Sanatorium;
 use App\Services\Dictionary\SanatoriumService;
+use DB;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -25,6 +26,7 @@ class SanatoriumController extends Controller
             request: $request,
             query: Sanatorium::query()->orderBy('id', 'asc'),
             resourceClass: SanatoriumResource::class,
+            perPage: 6,
         );
 
         return Inertia::render('Dictionary/Sanatorium/Index', [
@@ -48,7 +50,17 @@ class SanatoriumController extends Controller
      */
     public function store(SanatoriumRequest $request, SanatoriumService $sanatoriumService): RedirectResponse
     {
-        $sanatoriumService->createSanatorium($request);
+        DB::transaction(function () use ($request, $sanatoriumService) {
+            $sanatorium = $sanatoriumService->createSanatorium($request->validated());
+
+            if ($request->hasFile('photo_thumbnail')) {
+                $sanatoriumService->uploadGeneralPhoto($request->file('photo_thumbnail'), $sanatorium);
+            }
+
+            if ($request->hasFile('images')) {
+                $sanatoriumService->uploadGalleryPhotos($request->file('images'), $sanatorium);
+            }
+        });
 
         return to_route('dictionary.sanatoriums.index')
             ->with('success', 'Запись успешно добавлена!');
@@ -59,8 +71,9 @@ class SanatoriumController extends Controller
      */
     public function show(Sanatorium $sanatorium): \Inertia\Response
     {
+        $sanatorium->load('photos');
         return Inertia::render('Dictionary/Sanatorium/Show', [
-            'sanatorium' => $sanatorium,
+            'sanatorium' => SanatoriumResource::make($sanatorium),
             'labels' => config('labels.sanatorium'),
         ]);
     }
@@ -95,7 +108,6 @@ class SanatoriumController extends Controller
     {
         $sanatorium->delete();
 
-        return to_route('dictionary.sanatoriums.index')
-            ->with('success', 'Запись успешно удалена!');
+        return back()->with('success', 'Запись успешно удалена!');
     }
 }

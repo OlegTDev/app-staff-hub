@@ -4,8 +4,9 @@ namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Image;
+use Illuminate\Support\Facades\Storage;
 
-class ImageUploadService
+class ImageStorageService
 {
     private string $disk;
 
@@ -15,6 +16,29 @@ class ImageUploadService
         private bool $isPrivate = false)
     {
         $this->disk = $this->isPrivate ? 'private' : 'public';
+    }
+
+    /**
+     * @return array{image: string|null, thumb: string|null}
+     */
+    public function upload(UploadedFile $uploadImage, string $folder = '/', int $width = null, int $height = null): array
+    {
+        $storePath = ['image' => null, 'thumb' => null];
+        $image = Image::fromUpload($uploadImage);
+        if ($width !== null || $height !== null) {
+            $image = $image->scale($width, $height);
+        }
+
+        $filename = \sprintf('%s.%s',
+            pathinfo($uploadImage->hashName(), PATHINFO_FILENAME),
+            'webp',
+        );
+
+        $storePath['image'] = $image
+            ->toWebp()
+            ->storeAs(path: $folder, name: $filename, disk: $this->disk);
+
+        return $storePath;
     }
 
     /**
@@ -55,6 +79,16 @@ class ImageUploadService
             ->storeAs(path: $folder, name: $filename, disk: $this->disk);
 
         return $storagePath;
+    }
+
+    public function deleteImage(string|array $url): bool
+    {
+        return Storage::disk($this->disk)->delete($url);
+    }
+
+    public function deleteFolder(string $folder): bool
+    {
+        return Storage::disk($this->disk)->deleteDirectory($folder);
     }
 
 }

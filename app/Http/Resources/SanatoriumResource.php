@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @mixin \App\Models\Dictionary\Sanatorium
@@ -26,8 +27,11 @@ class SanatoriumResource extends JsonResource
             'services' => $this->services,
             'medical_profiles' => $this->medical_profiles,
             'description' => $this->description,
+            'photo_thumbnail' => $this->photo_thumbnail ? Storage::url($this->photo_thumbnail) : null,
             'created_at' => $this->created_at,
             'updated_at'=> $this->updated_at,
+
+            'photos' => $this->whenLoaded('photos', fn() => SanatoriumPhotoResource::collection($this->photos)),
         ];
     }
 }

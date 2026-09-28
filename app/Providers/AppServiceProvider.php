@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
-use App\Services\ImageUploadService;
+use App\Models\Dictionary\Sanatorium;
+use App\Observers\SanatoriumObserver;
+use App\Services\ImageStorageService;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
 
@@ -14,10 +16,10 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
-        $this->app->bind(ImageUploadService::class, function($app) {
+        $this->app->bind(ImageStorageService::class, function($app) {
             $config = config('images.settings.default.thumb');
 
-            return new ImageUploadService(
+            return new ImageStorageService(
                 width:  $config['width'],
                 height: $config['height'],
                 isPrivate: $config['is_private']
@@ -31,5 +33,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         JsonResource::withoutWrapping();
+        Sanatorium::observe(SanatoriumObserver::class);
     }
 }
