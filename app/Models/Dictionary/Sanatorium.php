@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string[] $services
  * @property string[] $medical_profiles
  * @property string|null $description
+ * @property string|null $photo_thumbnail
  * @property \Carbon\CarbonInterface $created_at
  * @property \Carbon\CarbonInterface $updated_at
  *

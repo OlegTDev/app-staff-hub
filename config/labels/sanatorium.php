@@ -11,6 +11,7 @@ return [
     'description' => 'Описание',
     'created_at' => 'Дата создания',
     'updated_at'=> 'Дата изменения',
+    'photo_thumbnail' => 'Главное фото санатория',
 
-    'photos' => 'Фотографии',
+    'photos' => 'Галерея',
 ];
