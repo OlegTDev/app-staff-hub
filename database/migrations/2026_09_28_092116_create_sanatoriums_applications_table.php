@@ -17,12 +17,12 @@ return new class extends Migration
             $table->foreignId('sanatorium_id')->constrained('sanatoriums')->cascadeOnDelete();
 
             $table->date('app_date');
-            $table->string('user_name');
-            $table->string('user_department');
-            $table->string('user_position');
-            $table->string('user_place');
-            $table->string('user_telephone_inner');
-            $table->string('user_telephone_outer');
+            $table->string('user_name', 100);
+            $table->string('user_department', 100);
+            $table->string('user_position', 100);
+            $table->string('user_place', 50);
+            $table->string('user_telephone_inner', 30);
+            $table->string('user_telephone_outer', 30);
             $table->jsonb('user_relatives')->nullable();
 
             $table->date('vacation_start');
