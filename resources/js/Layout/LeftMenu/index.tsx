@@ -52,6 +52,7 @@ export function LeftMenu() {
           key: 'applications',
           icon: <FileTextOutlined size={iconSize} />,
           label: 'Заявления',
+          onClick: () => router.get(route('sanatoriums.applications.index')),
         },
       ],
     },
