@@ -14,6 +14,7 @@ Route::middleware('auth')->group(static function() {
     require __DIR__ . '/web/users.php';
     require __DIR__ . '/web/roles.php';
     require __DIR__ . '/web/dictionary.php';
+    require __DIR__ . '/web/sanatoriums.applications.php';
 });
 
 
