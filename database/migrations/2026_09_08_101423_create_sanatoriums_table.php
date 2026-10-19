@@ -29,7 +29,7 @@ return new class extends Migration
         Schema::create('sanatorium_photos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sanatorium_id')->constrained('sanatoriums')->cascadeOnDelete();
-            $table->string('type');
+            $table->string('type', 30);
             $table->string('photo_file', 250);
             $table->string('thumb_file', 250);
             $table->timestamps();

@@ -6,9 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Models\SanatoriumApplication
+ * @mixin \App\Models\Sanatorium\DocumentSanatorium
  */
-class SanatoriumApplicationResource extends JsonResource
+class DocumentSanatoriumResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -20,6 +20,8 @@ class SanatoriumApplicationResource extends JsonResource
         return [
             'id' => $this->id,
             'sanatorium_id' => $this->sanatorium_id,
+            'to_organization' => $this->to_organization,
+            'to_manager_name' => $this->to_manager_name,
             'app_date' => $this->app_date,
             'user_name' => $this ->user_name,
             'user_department' => $this->user_department,
@@ -34,9 +36,8 @@ class SanatoriumApplicationResource extends JsonResource
             'arrival_date_from' => $this->arrival_date_from,
             'arrival_date_to' => $this->arrival_date_to,
             'status' => $this->status,
-            'create_at' => $this->create_at,
-            'updated_at' => $this->updated_at,
 
+            'document' => $this->whenLoaded('document', fn() => DocumentResource::make($this->document)),
             'sanatorium' => $this->whenLoaded('sanatorium', fn() => SanatoriumResource::make($this->sanatorium)),
             'sanatoriumsAdditional' => $this->whenLoaded('sanatoriumsAdditional', fn() => SanatoriumResource::collection($this->sanatoriumsAdditional)),
         ];

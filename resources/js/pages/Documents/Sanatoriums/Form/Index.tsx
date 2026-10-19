@@ -202,13 +202,10 @@ export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord }: Fo
             )}
           </Col>
           <Col span={24}>
-            <FormItem
-              name="agree"
-              valuePropName="checked"
-            >
+            <FormItem>
               <Checkbox
                 style={{ fontWeight: 'bold' }}
-                value={data.agree}
+                checked={data.agree}
                 onChange={(e) => setData('agree', e.target.checked)}
               >
                 В случае отказа от путёвок, выделенных мне и моей семье, обязуюсь найти кандидатов на санаторно-курортное лечение

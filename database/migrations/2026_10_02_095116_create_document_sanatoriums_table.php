@@ -11,20 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sanatoriums_applications', function (Blueprint $table) {
+        Schema::create('document_sanatoriums', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('sanatorium_id')->constrained('sanatoriums')->cascadeOnDelete();
 
+            $table->string('to_organization');
+            $table->string('to_manager_name');
+
+            $table->foreignId('sanatorium_id')->constrained('sanatoriums')->cascadeOnDelete();
             $table->date('app_date');
             $table->string('user_name', 100);
+            $table->string('user_organization', 200);
             $table->string('user_department', 100);
             $table->string('user_position', 100);
             $table->string('user_place', 50);
             $table->string('user_telephone_inner', 30);
             $table->string('user_telephone_outer', 30);
             $table->jsonb('user_relatives')->nullable();
-
             $table->date('vacation_start');
             $table->date('vacation_end');
             $table->boolean('any_date_during_vacation')->default(false);
@@ -32,17 +34,15 @@ return new class extends Migration
             $table->date('arrival_date_to')->nullable();
 
             $table->string('status')->default('new');
-
-            $table->timestamps();
         });
 
-        Schema::create('sanatoriums_applications_additional', function (Blueprint $table) {
+        Schema::create('document_sanatorium_additional', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sanatorium_id')->constrained('sanatoriums')->cascadeOnDelete();
-            $table->foreignId('sanatorium_application_id')->constrained('sanatoriums_applications')->cascadeOnUpdate();
+            $table->foreignId('document_sanatorium_id')->constrained('document_sanatoriums')->cascadeOnUpdate();
             $table->integer('sort_order');
 
-            $table->unique(['sanatorium_id', 'sanatorium_application_id']);
+            $table->unique(['sanatorium_id', 'document_sanatorium_id']);
         });
     }
 
@@ -51,7 +51,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sanatoriums_applications_additional');
-        Schema::dropIfExists('sanatoriums_applications');
+        Schema::dropIfExists('document_sanatorium_additional');
+        Schema::dropIfExists('document_sanatoriums');
     }
 };
