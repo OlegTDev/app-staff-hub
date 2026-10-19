@@ -16,8 +16,8 @@ export default function Create({ sanatoriums, labels }: CreateProps): React.JSX.
 
   usePageBreadcrumbs([
     { title: "Главная", href: route('main') },
-    { title: "Санаторно-курортное лечение" },
-    { title: "Заявления", href: route('sanatoriums.applications.index') },
+    { title: "Заявления", href: route('documents.index') },
+    { title: "Заявления на санаторно-курортное лечение", href: route('documents.sanatoriums.index') },
     { title },
   ]);
 
@@ -29,7 +29,7 @@ export default function Create({ sanatoriums, labels }: CreateProps): React.JSX.
       <Form
         labels={labels}
         sanatoriums={sanatoriums}
-        actionUrl={route('sanatoriums.applications.store')}
+        actionUrl={route('documents.sanatoriums.store')}
         isNewRecord={true}
       />
     </>

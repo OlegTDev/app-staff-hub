@@ -8,6 +8,13 @@ export interface Relative {
   description?: string;
 };
 
+export interface Document {
+  id: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export interface Application {
   id: number;
   sanatorium_id: number;
@@ -28,6 +35,7 @@ export interface Application {
   create_at: string;
   updated_at: string;
   sanatoriumsAdditional: Sanatorium[];
+  document: Document;
 }
 
 type RelativeValidationLabels = {
