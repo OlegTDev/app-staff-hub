@@ -3,7 +3,7 @@
 return [
     'id' => '#',
     'sanatorium_id' => 'Основной санаторий',
-    'app_date' => 'Дата',
+    'app_date' => 'Дата заявления',
     'user_name' => 'ФИО',
     'user_department' => 'Отдел',
     'user_position' => 'Должность',
@@ -21,8 +21,6 @@ return [
     'arrival_date_from' => 'Дата заезда от',
     'arrival_date_to' => 'Дата заезда до',
     'status' => 'Статус',
-    'created_at' => 'Дата создания',
-    'updated_at'=> 'Дата изменения',
 
     'sanatorium' => 'Основной санаторий',
     'sanatoriumsAdditional' => 'Дополнительные санатории',
