@@ -2,15 +2,14 @@
 
 namespace App\Http\Requests;
 
-use Carbon\Carbon;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
- * @mixin \App\Models\SanatoriumApplication
+ * @mixin \App\Models\Sanatorium\DocumentSanatorium
  */
-class SanatoriumApplicationRequest extends FormRequest
+class DocumentSanatoriumRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -19,35 +18,6 @@ class SanatoriumApplicationRequest extends FormRequest
     {
         return true;
     }
-
-    protected function passedValidation(): void
-    {
-        parent::passedValidation();
-
-        // $updates = [];
-
-        // if ($this->filled('vacation_start')) {
-        //     $updates['vacation_start'] = Carbon::createFromFormat('d.m.Y', $this->vacation_start)->format('Y-m-d');
-        // }
-        // if ($this->filled('vacation_end')) {
-        //     $updates['vacation_end'] = Carbon::createFromFormat('d.m.Y', $this->vacation_end)->format('Y-m-d');
-        // }
-
-        // $this->replace($updates);
-    }
-
-    // protected function passesAuthorization(): bool
-    // {
-    //     if (!parent::passesAuthorization()) {
-    //         return false;
-    //     }
-
-    //     $this->merge([
-    //         'user_id' => auth()->id(),
-    //     ]);
-
-    //     return true;
-    // }
 
     /**
      * Get the validation rules that apply to the request.
@@ -74,14 +44,15 @@ class SanatoriumApplicationRequest extends FormRequest
             'vacation_start' => ['required', 'date', Rule::date()->format('Y-m-d')],
             'vacation_end' => ['required', 'date', Rule::date()->format('Y-m-d')],
             'any_date_during_vacation' => ['boolean'],
-            'arrival_date_from' => ['date', 'required_if_declined:any_date_during_vacation'],
-            'arrival_date_to' => ['date', 'required_if_declined:any_date_during_vacation'],
+            'arrival_date_from' => ['date', 'required_if_declined:any_date_during_vacation', Rule::date()->format('Y-m-d')],
+            'arrival_date_to' => ['date', 'required_if_declined:any_date_during_vacation', Rule::date()->format('Y-m-d')],
+            // 'app_date' => ['required', 'date', Rule::date()->format('Y-m-d')],
             'agree' => ['accepted'],
         ];
     }
 
     public function attributes(): array
     {
-        return config('labels.sanatorium_applications');
+        return config('labels.document_sanatorium');
     }
 }
