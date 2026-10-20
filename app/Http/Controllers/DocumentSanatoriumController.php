@@ -66,7 +66,6 @@ class DocumentSanatoriumController extends Controller
     public function store(DocumentSanatoriumRequest $request): RedirectResponse
     {
         $validated = $request->validated();
-        $data = [...$validated, 'user_organization' => 'УФНС', 'app_date' => now()->format('Y-m-d')];
         $syncData = [];
         foreach ($validated['sanatoriumsAdditional'] as $index => $id) {
             $syncData[$id] = [
@@ -74,7 +73,7 @@ class DocumentSanatoriumController extends Controller
             ];
         }
 
-        $documentSanatorium = DocumentSanatorium::create($data);
+        $documentSanatorium = DocumentSanatorium::create($validated);
         $documentSanatorium->sanatoriumsAdditional()->sync($syncData);
         $documentSanatorium->document()->create(['user_id' => auth()->id(), 'status' => 'new']);
 
