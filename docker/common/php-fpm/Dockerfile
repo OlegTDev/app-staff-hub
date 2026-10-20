@@ -1,4 +1,4 @@
-FROM php:8.3-fpm-alpine AS base
+FROM php:8.5-fpm-alpine AS base
 
 RUN apk add --no-cache \
         libpng \
@@ -18,7 +18,7 @@ RUN apk add --no-cache \
         libjpeg-turbo-dev \
         libwebp-dev \
     && docker-php-ext-configure gd --with-jpeg --with-webp \
-    && docker-php-ext-install -j$(nproc) pdo pdo_pgsql pgsql ldap gd zip opcache \
+    && docker-php-ext-install -j$(nproc) pdo pdo_pgsql pgsql ldap gd zip \
     && apk del .build-deps
 
 ARG USER_ID=1000
