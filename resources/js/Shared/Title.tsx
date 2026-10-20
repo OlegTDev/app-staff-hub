@@ -16,11 +16,14 @@ export default function Title({ text, level = 1, style, ...props }: CustomTitleP
       style={{
         display: "flex",
         alignItems: "center",
-        borderLeft: `4px solid ${token.colorPrimary}`,
-        paddingLeft: token.paddingSM,
+        border: `1px solid ${token.colorBorder}`,
+        borderLeft: `6px solid ${token.colorPrimary}`,
+        borderRadius: token.borderRadius,
+        padding: token.paddingSM,
         margin: 0,
         marginBottom: token.marginLG,
         lineHeight: 1.2,
+        backgroundColor: token.colorBgContainer,
         ...style,
       }}
     >
