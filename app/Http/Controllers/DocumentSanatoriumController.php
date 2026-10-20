@@ -52,6 +52,10 @@ class DocumentSanatoriumController extends Controller
         return Inertia::render('Documents/Sanatoriums/Create', [
             'labels' => config('labels.document_sanatorium'),
             'sanatoriums' => $sanatoriums,
+            'settings' => [
+                'organization' => config('settings.organization.normal'),
+                'manager' => config('settings.manager.toShort'),
+            ],
         ]);
     }
 
@@ -62,7 +66,6 @@ class DocumentSanatoriumController extends Controller
     public function store(DocumentSanatoriumRequest $request): RedirectResponse
     {
         $validated = $request->validated();
-        $data = [...$validated, 'user_organization' => 'УФНС', 'app_date' => now()->format('Y-m-d'), 'to_organization' => 'UFNS', 'to_manager_name' => 'RUK'];
         $syncData = [];
         foreach ($validated['sanatoriumsAdditional'] as $index => $id) {
             $syncData[$id] = [
@@ -70,7 +73,7 @@ class DocumentSanatoriumController extends Controller
             ];
         }
 
-        $documentSanatorium = DocumentSanatorium::create($data);
+        $documentSanatorium = DocumentSanatorium::create($validated);
         $documentSanatorium->sanatoriumsAdditional()->sync($syncData);
         $documentSanatorium->document()->create(['user_id' => auth()->id(), 'status' => 'new']);
 
@@ -92,26 +95,52 @@ class DocumentSanatoriumController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * @route GET /documents/sanatoriums/{documentSanatorium}/edit
      */
-    public function edit(string $id)
+    public function edit(DocumentSanatorium $documentSanatorium): \Inertia\Response
     {
-        //
+        $documentSanatorium->load(['sanatorium', 'sanatoriumsAdditional']);
+
+        return Inertia::render('Documents/Sanatoriums/Edit', [
+            'labels' => config('labels.document_sanatorium'),
+            'documentSanatorium' => DocumentSanatoriumResource::make($documentSanatorium),
+            'sanatoriums' => SanatoriumResource::collection(Sanatorium::get()),
+        ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * @route PUT /documents/sanatoriums/{documentSanatorium}
      */
-    public function update(Request $request, string $id)
+    public function update(DocumentSanatoriumRequest $request, DocumentSanatorium $documentSanatorium): RedirectResponse
     {
-        //
+        $validated = $request->validated();
+        $data = $validated;
+
+        $syncData = [];
+        if (isset($validated['sanatoriumsAdditional'])) {
+            foreach ($validated['sanatoriumsAdditional'] as $index => $id) {
+                $syncData[$id] = [
+                    'sort_order' => $index + 1,
+                ];
+            }
+        }
+
+        $documentSanatorium->update($data);
+        $documentSanatorium->sanatoriumsAdditional()->sync($syncData);
+
+        return to_route('documents.sanatoriums.index')
+            ->with('success', 'Заявление обновлено.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @route DELETE /documents/sanatoriums/{documentSanatorium}
      */
-    public function destroy(string $id)
+    public function destroy(DocumentSanatorium $documentSanatorium): RedirectResponse
     {
-        //
+        $documentSanatorium->document()->delete();
+        $documentSanatorium->delete();
+
+        return to_route('documents.sanatoriums.index')
+            ->with('success', 'Заявление удалено.');
     }
 }

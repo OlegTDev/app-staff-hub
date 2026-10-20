@@ -1,4 +1,4 @@
-import { Card, Col, Row, Form, Button, Select, DatePicker, Checkbox, Alert } from "antd";
+import { Card, Col, Row, Form, Button, Select, DatePicker, Checkbox, Alert, Input } from "antd";
 import { Application, ApplicationLabels } from "../types";
 import { useForm } from "@inertiajs/react";
 import { useAuth } from "@/hooks/useAuth";
@@ -18,6 +18,10 @@ type FormProps = {
   sanatoriums: Sanatorium[];
   actionUrl: string;
   isNewRecord: boolean;
+  settings?: {
+    organization: string;
+    manager: string;
+  };
 }
 
 const strToDate = (date?: string): dayjs.Dayjs | null => {
@@ -28,12 +32,14 @@ const formatDateISO = (date?: dayjs.Dayjs|null): string|undefined => {
   return date ? date.format('YYYY-MM-DD') : undefined;
 };
 
-export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord }: FormProps): React.JSX.Element {
+export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord, settings }: FormProps): React.JSX.Element {
   const { user } = useAuth();
 
   const { data, setData, post, put, errors, processing, clearErrors } = useForm<FormFields>({
+    to_organization: model?.to_organization ?? settings?.organization,
+    to_manager_name: model?.to_manager_name ?? settings?.manager,
     sanatorium_id: model?.sanatorium_id ?? undefined,
-    app_date: model?.app_date,
+    app_date: model?.app_date ?? formatDateISO(dayjs()),
     user_name: model?.user_name ?? user?.name,
     user_department: model?.user_department ?? user?.department,
     user_position: model?.user_position ?? user?.position,
@@ -73,6 +79,43 @@ export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord }: Fo
               labels={labels}
               dateFormat={DATE_FORMAT}
             />
+          </Col>
+          <Col span={24}>
+            <Card title="Куда направляется">
+              <Row gutter={[32, 32]}>
+                <Col span={24}>
+                  <strong>Руководителю</strong>
+                </Col>
+                <Col span={12}>
+                  <FormItem
+                    label={labels.to_organization}
+                    layout="vertical"
+                    validateStatus={errors.to_organization ? 'error' : ''}
+                    help={errors.to_organization}
+                  >
+                    <Input
+                      placeholder={labels.to_organization}
+                      value={data.to_organization}
+                      onChange={e => setData('to_organization', e.target.value)}
+                    />
+                  </FormItem>
+                </Col>
+                <Col span={12}>
+                  <FormItem
+                    label={labels.to_manager_name}
+                    layout="vertical"
+                    validateStatus={errors.to_manager_name ? 'error' : ''}
+                    help={errors.to_manager_name}
+                  >
+                    <Input
+                      placeholder={labels.to_manager_name}
+                      value={data.to_manager_name}
+                      onChange={e => setData('to_manager_name', e.target.value)}
+                    />
+                  </FormItem>
+                </Col>
+              </Row>
+            </Card>
           </Col>
           <Col span={24}>
             <Card title="Период отпуска">
@@ -192,15 +235,29 @@ export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord }: Fo
             </Card>
           </Col>
           <Col span={24}>
-            {Object.keys(errors ?? {}).length > 0 && (
+            <FormItem
+              layout="vertical"
+              label={labels.app_date}
+              validateStatus={errors.app_date ? 'error' : ''}
+              help={errors.app_date}
+            >
+              <DatePicker
+                value={strToDate(data.app_date)}
+                onChange={(date) => setData('app_date', formatDateISO(date))}
+                format={DATE_FORMAT}
+              />
+            </FormItem>
+          </Col>
+          {Object.keys(errors ?? {}).length > 0 && (
+            <Col span={24}>
               <Alert
                 type="error"
                 showIcon
                 title="Ошибки заполнения документа"
                 description={Object.keys(errors).map((key) => (<div key={key}>{errors[key as any]}</div>))}
               />
-            )}
-          </Col>
+            </Col>
+          )}
           <Col span={24}>
             <FormItem>
               <Checkbox

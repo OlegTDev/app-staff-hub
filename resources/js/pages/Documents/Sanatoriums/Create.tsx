@@ -10,13 +10,16 @@ const title = 'Создание заявления';
 interface CreateProps {
   sanatoriums: Sanatorium[];
   labels: ApplicationLabels;
+  settings: {
+    organization: string;
+    manager: string;
+  };
 };
 
-export default function Create({ sanatoriums, labels }: CreateProps): React.JSX.Element {
+export default function Create({ sanatoriums, labels, settings }: CreateProps): React.JSX.Element {
 
   usePageBreadcrumbs([
     { title: "Главная", href: route('main') },
-    { title: "Заявления", href: route('documents.index') },
     { title: "Заявления на санаторно-курортное лечение", href: route('documents.sanatoriums.index') },
     { title },
   ]);
@@ -31,6 +34,7 @@ export default function Create({ sanatoriums, labels }: CreateProps): React.JSX.
         sanatoriums={sanatoriums}
         actionUrl={route('documents.sanatoriums.store')}
         isNewRecord={true}
+        settings={settings}
       />
     </>
   );
