@@ -27,6 +27,8 @@ class DocumentSanatoriumRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'to_organization' => ['required', 'string', 'max:100'],
+            'to_manager_name' => ['required', 'string', 'max:100'],
             'sanatorium_id' => ['required', 'exists:sanatoriums,id'],
             'sanatoriumsAdditional' => ['array'],
             'sanatoriumsAdditional.*' => ['numeric', 'exists:sanatoriums,id'],
@@ -46,7 +48,7 @@ class DocumentSanatoriumRequest extends FormRequest
             'any_date_during_vacation' => ['boolean'],
             'arrival_date_from' => ['date', 'required_if_declined:any_date_during_vacation', Rule::date()->format('Y-m-d')],
             'arrival_date_to' => ['date', 'required_if_declined:any_date_during_vacation', Rule::date()->format('Y-m-d')],
-            // 'app_date' => ['required', 'date', Rule::date()->format('Y-m-d')],
+            'app_date' => ['required', 'date', Rule::date()->format('Y-m-d')],
             'agree' => ['accepted'],
         ];
     }

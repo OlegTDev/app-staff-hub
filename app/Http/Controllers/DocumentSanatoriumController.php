@@ -52,6 +52,10 @@ class DocumentSanatoriumController extends Controller
         return Inertia::render('Documents/Sanatoriums/Create', [
             'labels' => config('labels.document_sanatorium'),
             'sanatoriums' => $sanatoriums,
+            'settings' => [
+                'organization' => config('settings.organization.normal'),
+                'manager' => config('settings.manager.toShort'),
+            ],
         ]);
     }
 
@@ -62,7 +66,7 @@ class DocumentSanatoriumController extends Controller
     public function store(DocumentSanatoriumRequest $request): RedirectResponse
     {
         $validated = $request->validated();
-        $data = [...$validated, 'user_organization' => 'УФНС', 'app_date' => now()->format('Y-m-d'), 'to_organization' => 'UFNS', 'to_manager_name' => 'RUK'];
+        $data = [...$validated, 'user_organization' => 'УФНС', 'app_date' => now()->format('Y-m-d')];
         $syncData = [];
         foreach ($validated['sanatoriumsAdditional'] as $index => $id) {
             $syncData[$id] = [
@@ -111,7 +115,7 @@ class DocumentSanatoriumController extends Controller
     public function update(DocumentSanatoriumRequest $request, DocumentSanatorium $documentSanatorium): RedirectResponse
     {
         $validated = $request->validated();
-        $data = [...$validated, 'to_organization' => 'UFNS', 'to_manager_name' => 'RUK'];
+        $data = $validated;
 
         $syncData = [];
         if (isset($validated['sanatoriumsAdditional'])) {
