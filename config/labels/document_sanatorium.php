@@ -24,4 +24,7 @@ return [
 
     'sanatorium' => 'Основной санаторий',
     'sanatoriumsAdditional' => 'Дополнительные санатории',
+
+    'to_organization' => 'Наименование организации',
+    'to_manager_name'=> 'ФИО руководителя',
 ];
