@@ -1,30 +1,68 @@
 import { Menu, MenuProps, theme } from "antd";
 import { HomeIcon, UserRoundCog } from "lucide-react";
-import { FileTextOutlined, HomeOutlined, MedicineBoxOutlined, BookOutlined, BuildOutlined } from "@ant-design/icons";
+import {
+  FileTextOutlined,
+  HomeOutlined,
+  MedicineBoxOutlined,
+  BookOutlined,
+  BuildOutlined,
+} from "@ant-design/icons";
 import { router, usePage } from "@inertiajs/react";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { menuConfig, childToParentMap, routeKeyMap, MenuItemConfig } from "./menuConfig";
 
-export type MenuItem = Required<MenuProps>['items'][number] & { link?: string, hide?: boolean, children?: MenuItem[] };
-
-const routeKeyMap: Record<string, string> = {
-  '/': 'home',
-  '/users': 'users',
-  '/dictionary/torms': 'torm',
-  '/dictionary/sanatoriums': 'sanatoriums',
-  '/documents/sanatoriums': 'applications',
+export type MenuItem = Required<MenuProps>['items'][number] & {
+  hide?: boolean;
+  children?: MenuItem[];
 };
 
-const childToParentMap: Record<string, string> = {
-  torm: 'dictionary',
-  sanatoriums: 'resort-treatment',
-  applications: 'resort-treatment',
+const icons: Record<string, React.ReactNode> = {
+  home: <HomeIcon size={16} />,
+  users: <UserRoundCog size={16} />,
+  dictionary: <BookOutlined size={16} />,
+  torm: <BuildOutlined size={16} />,
+  'resort-treatment': <MedicineBoxOutlined size={16} />,
+  sanatoriums: <HomeOutlined size={16} />,
+  applications: <FileTextOutlined size={16} />,
 };
 
-function getSelectedKey(url: string): string[] {
-  const path = url.split('?')[0];
-  const key = routeKeyMap[path];
-  return key ? [key] : [];
+function hasAccess(
+  item: MenuItemConfig,
+  hasRole: (r: string) => boolean
+): boolean {
+  if (!item.roles) return true;
+  return item.roles.some((r) => hasRole(r));
+}
+
+function buildMenuItems(
+  config: typeof menuConfig,
+  hasRole: (r: string) => boolean,
+  iconSize: number
+): MenuItem[] {
+  return config
+    .filter((item) => hasAccess(item, hasRole))
+    .map(({ roles, children, ...item }) => ({
+      ...item,
+      icon: icons[item.key],
+      onClick: () => {
+        if (item.route) router.get(item.route);
+      },
+      children: children ? buildMenuItems(children, hasRole, iconSize) : undefined,
+    }));
+}
+
+function getSelectedKey(path: string): string[] {
+  const cleanPath = path.split('?')[0];
+  const key = routeKeyMap[cleanPath];
+  if (key) return [key];
+  const entries = Object.entries(routeKeyMap).sort(
+    ([a], [b]) => b.length - a.length
+  );
+  for (const [menuPath, menuKey] of entries) {
+    if (cleanPath.startsWith(menuPath)) return [menuKey];
+  }
+  return [];
 }
 
 function getOpenKeys(selectedKey: string[]): string[] {
@@ -53,61 +91,15 @@ export function LeftMenu() {
     });
   }, [autoOpenKeys]);
 
-  const menuItems: MenuItem[] = [
-    {
-      key: 'home',
-      label: 'Главная',
-      icon: <HomeIcon size={iconSize} />,
-      onClick: () => router.get('/'),
-      hide: !hasRole('admin'),
-    },
-    {
-      key: 'users',
-      label: 'Пользователи',
-      icon: <UserRoundCog size={iconSize} />,
-      onClick: () => router.get(route('users.index')),
-    },
-    {
-      key: 'dictionary',
-      label: 'Справочники',
-      icon: <BookOutlined size={iconSize} />,
-      hide: !hasRole('admin'),
-      children:[{
-        key: 'torm',
-        label: 'Список ТОРМ',
-        icon: <BuildOutlined size={iconSize} />,
-        onClick: () => router.get(route('dictionary.torms.index')),
-      }],
-    },
-    {
-      key: 'resort-treatment',
-      icon: <MedicineBoxOutlined size={iconSize} />,
-      label: 'Санаторно-курортное лечение',
-      children: [
-        {
-          key: 'sanatoriums',
-          icon: <HomeOutlined size={iconSize} />,
-          label: 'Санатории',
-          onClick: () => router.get(route('dictionary.sanatoriums.index')),
-        },
-        {
-          key: 'applications',
-          icon: <FileTextOutlined size={iconSize} />,
-          label: 'Заявления',
-          onClick: () => router.get(route('documents.sanatoriums.index')),
-        },
-      ],
-    },
-  ];
-
-  const filteredMenuItems = menuItems
-    .filter((item) => !item.hide)
-    .map(({ hide , ...rest }) => rest);
+  const menuItems = useMemo(
+    () => buildMenuItems(menuConfig, hasRole, iconSize),
+    [hasRole, iconSize]
+  );
 
   return (
     <Menu
       mode="inline"
-      items={filteredMenuItems}
+      items={menuItems}
       selectedKeys={selectedKeys}
       openKeys={openKeys}
       onOpenChange={setOpenKeys}
