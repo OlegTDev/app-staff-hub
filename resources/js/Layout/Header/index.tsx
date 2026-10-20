@@ -33,7 +33,7 @@ export function Header() {
     <AntHeader
       style={{
         background: "transparent",
-        borderBottom: `1px solid ${token.colorBorderSecondary}`,
+        borderBottom: `1px solid ${token.colorBorder}`,
         padding: `0 ${token.padding}px`,
         gap: token.sizeLG,
         display: "flex",

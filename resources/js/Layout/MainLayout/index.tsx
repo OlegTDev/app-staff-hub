@@ -34,6 +34,7 @@ export function MainLayout({ children }: Props) {
             display: "flex",
             flexDirection: "column",
             overflow: "auto",
+            backgroundColor: token.colorBgLayout,
           }}
         >
           <FlashNotifications />
