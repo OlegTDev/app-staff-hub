@@ -74,6 +74,11 @@ class User extends Authenticatable
         return $this->roles()->where('name', $name)->exists();
     }
 
+    public function hasRoles(...$names): bool
+    {
+        return $this->roles()->whereIn('name', $names)->exists();
+    }
+
     public function torm(): HasOne
     {
         return $this->hasOne(Torm::class, 'code', 'torm_code');
