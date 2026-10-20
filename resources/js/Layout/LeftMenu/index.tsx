@@ -1,15 +1,57 @@
 import { Menu, MenuProps, theme } from "antd";
 import { HomeIcon, UserRoundCog } from "lucide-react";
 import { FileTextOutlined, HomeOutlined, MedicineBoxOutlined, BookOutlined, BuildOutlined } from "@ant-design/icons";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
 export type MenuItem = Required<MenuProps>['items'][number] & { link?: string, hide?: boolean, children?: MenuItem[] };
+
+const routeKeyMap: Record<string, string> = {
+  '/': 'home',
+  '/users': 'users',
+  '/dictionary/torms': 'torm',
+  '/dictionary/sanatoriums': 'sanatoriums',
+  '/documents/sanatoriums': 'applications',
+};
+
+const childToParentMap: Record<string, string> = {
+  torm: 'dictionary',
+  sanatoriums: 'resort-treatment',
+  applications: 'resort-treatment',
+};
+
+function getSelectedKey(url: string): string[] {
+  const path = url.split('?')[0];
+  const key = routeKeyMap[path];
+  return key ? [key] : [];
+}
+
+function getOpenKeys(selectedKey: string[]): string[] {
+  const key = selectedKey[0];
+  if (!key) return [];
+  const parent = childToParentMap[key];
+  return parent ? [parent] : [];
+}
 
 export function LeftMenu() {
   const { token } = theme.useToken();
   const { hasRole } = useAuth();
   const iconSize = token.fontSize;
+  const url = usePage().url;
+  const selectedKeys = useMemo(() => getSelectedKey(url), [url]);
+  const [openKeys, setOpenKeys] = useState<string[]>(getOpenKeys(selectedKeys));
+
+  const autoOpenKeys = useMemo(() => getOpenKeys(selectedKeys), [selectedKeys]);
+
+  useEffect(() => {
+    setOpenKeys((prev) => {
+      if (prev.length === autoOpenKeys.length && prev.every((k, i) => k === autoOpenKeys[i])) {
+        return prev;
+      }
+      return autoOpenKeys;
+    });
+  }, [autoOpenKeys]);
 
   const menuItems: MenuItem[] = [
     {
@@ -63,6 +105,12 @@ export function LeftMenu() {
     .map(({ hide , ...rest }) => rest);
 
   return (
-    <Menu mode="inline" items={filteredMenuItems} defaultSelectedKeys={['home']} />
+    <Menu
+      mode="inline"
+      items={filteredMenuItems}
+      selectedKeys={selectedKeys}
+      openKeys={openKeys}
+      onOpenChange={setOpenKeys}
+    />
   );
 }
