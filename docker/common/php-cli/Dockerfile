@@ -1,4 +1,4 @@
-FROM php:8.3-cli-alpine AS base
+FROM php:8.5-cli-alpine AS base
 
 RUN apk add --no-cache \
         libpng \
@@ -15,15 +15,6 @@ RUN apk add --no-cache \
         zlib-dev \
     && docker-php-ext-install -j$(nproc) pdo pdo_pgsql pgsql ldap gd zip \
     && apk del .build-deps
-
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
-RUN install-php-extensions xdebug
-RUN docker-php-ext-enable xdebug \
-    && echo "xdebug.mode=debug,coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-
 
 ARG USER_ID=1000
 ARG GROUP_ID=1000
