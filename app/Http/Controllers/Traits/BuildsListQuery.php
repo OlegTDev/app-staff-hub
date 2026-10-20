@@ -31,7 +31,7 @@ trait BuildsListQuery
         array $filterFields = ['search'],
         int $perPage = 10,
         ?string $resourceClass = null,
-        \Closure $transformCallback = null,
+        \Closure|null $transformCallback = null,
     ): array {
         $paginator = $this->baseBuildQuery($request, $query, $allowSortFields, $filterFields, $perPage);
 

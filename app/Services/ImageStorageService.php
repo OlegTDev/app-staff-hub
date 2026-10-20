@@ -21,7 +21,7 @@ class ImageStorageService
     /**
      * @return array{image: string|null, thumb: string|null}
      */
-    public function upload(UploadedFile $uploadImage, string $folder = '/', int $width = null, int $height = null): array
+    public function upload(UploadedFile $uploadImage, string $folder = '/', int|null $width = null, int|null $height = null): array
     {
         $storePath = ['image' => null, 'thumb' => null];
         $image = Image::fromUpload($uploadImage);
