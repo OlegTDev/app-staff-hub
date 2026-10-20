@@ -26,6 +26,8 @@ export type FormVacationsFields = {
 export type FormFields = FormEmployeeFields &
   FormSanatoriumFields &
   FormVacationsFields & {
+    to_organization?: string;
+    to_manager_name?: string;
     app_date?: string;
     agree: boolean;
   };

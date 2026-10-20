@@ -18,6 +18,8 @@ export interface Document {
 export interface Application {
   id: number;
   sanatorium_id: number;
+  to_organization?: string;
+  to_manager_name?: string;
   app_date: string;
   user_name: string;
   user_department: string;
