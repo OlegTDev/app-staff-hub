@@ -22,6 +22,7 @@ export interface Application {
   to_manager_name?: string;
   app_date: string;
   user_name: string;
+  user_organization: string;
   user_department: string;
   user_position: string;
   user_place: string;

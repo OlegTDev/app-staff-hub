@@ -2,6 +2,7 @@ import { Relative } from "../types";
 
 export type FormEmployeeFields = {
   user_name?: string;
+  user_organization?: string;
   user_department?: string;
   user_position?: string;
   user_place?: string;

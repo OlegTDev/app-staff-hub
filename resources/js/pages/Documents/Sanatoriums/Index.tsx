@@ -1,7 +1,7 @@
 import { BaseFilters, PaginatedData } from "@/types/pagination";
 import { Head, router } from "@inertiajs/react";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Button, Space, Table, Tooltip } from "antd";
+import { Button, Popconfirm, Space, Table, Tooltip } from "antd";
 import { Application, ApplicationLabels } from "./types";
 import { usePageBreadcrumbs } from "@/hooks/usePageBreadcrumbs";
 import Title from "@/Shared/Title";
@@ -30,7 +30,9 @@ export default function Index({ items, query, labels, isModerator }: PageProps):
     query,
   });
 
-
+  const handleDelete = (id: number) => {
+    router.delete(route('documents.sanatoriums.destroy', id));
+  };
 
   const columns = [
     { dataIndex: 'id', title: labels.id },
@@ -46,9 +48,15 @@ export default function Index({ items, query, labels, isModerator }: PageProps):
           <Tooltip title="Редактирование">
             <Button icon={<EditOutlined />} onClick={() => {  }} />
           </Tooltip>
-          <Tooltip title="Удалить" color="red">
-            <Button icon={<DeleteOutlined />} danger onClick={() => {   }} />
-          </Tooltip>
+          <Popconfirm
+            title="Удаление заявления"
+            description="Вы уверены, что хотите удалить это заявление?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Да"
+            cancelText="Нет"
+          >
+            <Button icon={<DeleteOutlined />} danger />
+          </Popconfirm>
         </Space>
       ),
       width: 85,

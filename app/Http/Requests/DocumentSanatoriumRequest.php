@@ -32,6 +32,7 @@ class DocumentSanatoriumRequest extends FormRequest
             'sanatorium_id' => ['required', 'exists:sanatoriums,id'],
             'sanatoriumsAdditional' => ['array'],
             'sanatoriumsAdditional.*' => ['numeric', 'exists:sanatoriums,id'],
+            'user_organization' => ['required', 'string', 'max:200'],
             'user_name' => ['required', 'string', 'max:100'],
             'user_department' => ['required', 'string', 'max:100'],
             'user_position' => ['required', 'string', 'max:100'],
