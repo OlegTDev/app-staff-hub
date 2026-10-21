@@ -27,7 +27,7 @@ class DocumentSanatoriumController extends Controller
         $user = auth()->user();
         $isModerator = $user->hasRoles(UserRole::ADMIN->value, UserRole::SANATORIUM_MODERATOR->value);
         $query = $documentSanatoriumService->getApplicationsBuilder($isModerator, $user->id);
-        $query->with(['sanatoriumsAdditional']);
+        $query->with(['sanatoriumsAdditional', 'document']);
 
         $paginatedData = $this->getPaginatedData(
             request: $request,

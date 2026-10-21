@@ -53,6 +53,9 @@ export default [
       'import/extensions': [
         'warn',
         'never',
+        {
+          "css": "always",
+        },
       ],
       'no-undef': 'off',
       'no-unused-vars': 'off',
