@@ -115,6 +115,10 @@ export default function Index({ items, query, labels, isModerator }: PageProps):
       <Head title={title} />
       <Title level={2} text={title} />
 
+      <div style={{ marginBottom: 16 }}>
+        <Button onClick={() => router.get(route('documents.sanatoriums.create'))}>Создать заявление</Button>
+      </div>
+
       <Table<Application>
         rowKey="id"
         dataSource={items.data}
@@ -127,8 +131,6 @@ export default function Index({ items, query, labels, isModerator }: PageProps):
         loading={table.loading}
         bordered
       />
-
-      <Button onClick={() => router.get(route('documents.sanatoriums.create'))}>Click me</Button>
 
       <Drawer
         title="Просмотр заявления"
