@@ -11,6 +11,9 @@ import { formatDate } from "@/utils/dateHelpers";
 import { useDataTable } from "@/hooks/useDataTable";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useState } from "react";
+import { breadcrumbMain } from '@/pages/breadcrumbsMain';
+import { breadcrumbSanatorium } from './breadcrumbSanatorium';
+
 
 const ZoomControls = ({ scale, setScale, initSize }: {
   scale: number;
@@ -45,12 +48,11 @@ type PageProps = {
 }
 
 export default function Index({ items, query, labels, isModerator }: PageProps): React.JSX.Element {
-  const title = isModerator ? 'Заявления' : 'Мои заявления';
+  const title = isModerator ? breadcrumbSanatorium.name : 'Мои заявления';
 
   usePageBreadcrumbs([
-    { title: "Главная", href: route('main') },
-    { title: "Санаторно-курортное лечение", href: route('dictionary.sanatoriums.index') },
-    { title },
+    { title: breadcrumbMain.name, href: breadcrumbMain.link },
+    { title: breadcrumbSanatorium.name }
   ]);
 
   const initSize = 1.2;
@@ -75,6 +77,10 @@ export default function Index({ items, query, labels, isModerator }: PageProps):
     setSelectedDocumentId(null);
   };
 
+  const handleEdit = (id: number) => {
+    router.get(route('documents.sanatoriums.edit', { id }));
+  };
+
   const handleDelete = (id: number) => {
     router.delete(route('documents.sanatoriums.destroy', id));
   };
@@ -93,7 +99,7 @@ export default function Index({ items, query, labels, isModerator }: PageProps):
             <Button icon={<EyeOutlined />} onClick={() => handleView(record)} />
           </Tooltip>
           <Tooltip title="Редактирование">
-            <Button icon={<EditOutlined />} onClick={() => {  }} />
+            <Button icon={<EditOutlined />} onClick={() => handleEdit(record.id)} />
           </Tooltip>
           <Popconfirm
             title="Удаление заявления"

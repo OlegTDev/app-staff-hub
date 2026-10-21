@@ -105,6 +105,10 @@ class DocumentSanatoriumController extends Controller
             'labels' => config('labels.document_sanatorium'),
             'documentSanatorium' => DocumentSanatoriumResource::make($documentSanatorium),
             'sanatoriums' => SanatoriumResource::collection(Sanatorium::get()),
+            'settings' => [
+                'organization' => config('settings.organization.normal'),
+                'manager' => config('settings.manager.toShort'),
+            ],
         ]);
     }
 

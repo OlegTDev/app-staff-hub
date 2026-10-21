@@ -4,6 +4,8 @@ import Title from "@/Shared/Title";
 import { Head } from "@inertiajs/react";
 import { ApplicationLabels } from "./types";
 import { Index as Form } from "./Form/Index";
+import { breadcrumbMain } from "@/pages/breadcrumbsMain";
+import { breadcrumbSanatorium } from "./breadcrumbSanatorium";
 
 const title = 'Создание заявления';
 
@@ -19,8 +21,8 @@ interface CreateProps {
 export default function Create({ sanatoriums, labels, settings }: CreateProps): React.JSX.Element {
 
   usePageBreadcrumbs([
-    { title: "Главная", href: route('main') },
-    { title: "Заявления на санаторно-курортное лечение", href: route('documents.sanatoriums.index') },
+    { title: breadcrumbMain.name, href: breadcrumbMain.link },
+    { title: breadcrumbSanatorium.name, href: breadcrumbSanatorium.link },
     { title },
   ]);
 

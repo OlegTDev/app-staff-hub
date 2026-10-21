@@ -32,6 +32,10 @@ const formatDateISO = (date?: dayjs.Dayjs|null): string|undefined => {
   return date ? date.format('YYYY-MM-DD') : undefined;
 };
 
+const dateToStr = (date?: string): string | undefined => {
+  return formatDateISO(strToDate(date));
+};
+
 export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord, settings }: FormProps): React.JSX.Element {
   const { user } = useAuth();
 
@@ -39,7 +43,7 @@ export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord, sett
     to_organization: model?.to_organization ?? settings?.organization,
     to_manager_name: model?.to_manager_name ?? settings?.manager,
     sanatorium_id: model?.sanatorium_id ?? undefined,
-    app_date: model?.app_date ?? formatDateISO(dayjs()),
+    app_date: dateToStr(model?.app_date) ?? formatDateISO(dayjs()),
     user_organization: model?.to_organization,
     user_name: model?.user_name ?? user?.name,
     user_department: model?.user_department ?? user?.department,
@@ -48,11 +52,11 @@ export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord, sett
     user_telephone_inner: model?.user_telephone_inner ?? user?.telephone,
     user_telephone_outer: model?.user_telephone_outer,
     user_relatives: model?.user_relatives ?? [],
-    vacation_start: model?.vacation_start,
-    vacation_end: model?.vacation_end,
+    vacation_start: dateToStr(model?.vacation_start),
+    vacation_end: dateToStr(model?.vacation_end),
     any_date_during_vacation: model?.any_date_during_vacation ?? true,
-    arrival_date_from: model?.arrival_date_from,
-    arrival_date_to: model?.arrival_date_to,
+    arrival_date_from: dateToStr(model?.arrival_date_from),
+    arrival_date_to: dateToStr(model?.arrival_date_to),
     sanatoriumsAdditional: model?.sanatoriumsAdditional.map(s => s.id) || [],
     agree: model?.agree || false,
   });
