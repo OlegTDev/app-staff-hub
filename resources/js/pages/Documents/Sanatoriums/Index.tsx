@@ -1,5 +1,3 @@
-import 'react-pdf/dist/Page/TextLayer.css';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
 import { BaseFilters, PaginatedData } from "@/types/pagination";
 import { Head, router } from "@inertiajs/react";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -9,36 +7,10 @@ import { usePageBreadcrumbs } from "@/hooks/usePageBreadcrumbs";
 import Title from "@/Shared/Title";
 import { formatDate } from "@/utils/dateHelpers";
 import { useDataTable } from "@/hooks/useDataTable";
-import { Document, Page, pdfjs } from "react-pdf";
 import { useState } from "react";
 import { breadcrumbMain } from '@/pages/breadcrumbsMain';
 import { breadcrumbSanatorium } from './breadcrumbSanatorium';
-
-
-const ZoomControls = ({ scale, setScale, initSize }: {
-  scale: number;
-  setScale: (value: React.SetStateAction<number>) => void;
-  initSize: number;
-}): React.JSX.Element => {
-
-  const zoomIn = () => setScale(prev => Math.min(prev + 0.1, 3.0));
-  const zoomOut = () => setScale(prev => Math.max(prev - 0.1, 0.5));
-
-  return (
-    <Space>
-      <Space.Compact>
-        <Button onClick={zoomOut}>-</Button>
-        <Space.Addon>{Math.round(scale/initSize * 100)}%</Space.Addon>
-        <Button onClick={zoomIn}>+</Button>
-      </Space.Compact>
-    </Space>
-  );
-};
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString();
+import { INIT_SCALE_SIZE, PdfPreview, ZoomControls } from './PdfPreview';
 
 type PageProps = {
   items: PaginatedData<Application>;
@@ -49,14 +21,12 @@ type PageProps = {
 
 export default function Index({ items, query, labels, isModerator }: PageProps): React.JSX.Element {
   const title = isModerator ? breadcrumbSanatorium.name : 'Мои заявления';
+  const [pdfPreviewScale, setPdfPreviewScale] = useState(INIT_SCALE_SIZE);
 
   usePageBreadcrumbs([
     { title: breadcrumbMain.name, href: breadcrumbMain.link },
     { title: breadcrumbSanatorium.name }
   ]);
-
-  const initSize = 1.2;
-  const [scale, setScale] = useState(initSize);
 
   const table = useDataTable<Application>({
     routeName: route('documents.sanatoriums.index'),
@@ -140,32 +110,21 @@ export default function Index({ items, query, labels, isModerator }: PageProps):
 
       <Drawer
         title="Просмотр заявления"
-        size={Math.max(600, scale * 630)}
+        size={Math.max(600, pdfPreviewScale * 630)}
         placement="right"
         open={drawerVisible}
         onClose={handleCloseDrawer}
         destroyOnHidden
         extra={
           <Space>
-            <ZoomControls key={1} initSize={initSize} scale={scale} setScale={setScale} />
+            <ZoomControls key={1} scale={pdfPreviewScale} onScaleChange={setPdfPreviewScale} />
             <Button key={2} onClick={() => window.open(pdfUrl, '_blank')}>Скачать</Button>
           </Space>
         }
       >
-        {pdfUrl ? (
-          <div className="pdf-preview-container">
-            <Document file={pdfUrl} loading={<div>Загрузка...</div>}>
-              <Page
-                scale={scale}
-                pageNumber={1}
-                renderTextLayer={true}
-                renderAnnotationLayer={false}
-              />
-            </Document>
-          </div>
-        ) : (
-          <div>Загрузка документа...</div>
-        )}
+        {selectedDocumentId &&
+          <PdfPreview url={route('documents.pdf', { document: selectedDocumentId })} scale={pdfPreviewScale} />
+        }
       </Drawer>
     </>
   );

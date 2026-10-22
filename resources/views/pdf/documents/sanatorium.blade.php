@@ -26,8 +26,7 @@
             padding: 0;
         }
         .header-right {
-            width: 55%;
-            padding-left: 45%;
+            width: 17.5em;
             font-size: 13px;
         }
         .title {

@@ -32,8 +32,6 @@ return new class extends Migration
             $table->boolean('any_date_during_vacation')->default(false);
             $table->date('arrival_date_from')->nullable();
             $table->date('arrival_date_to')->nullable();
-
-            $table->string('status')->default('new');
         });
 
         Schema::create('document_sanatorium_additional', function (Blueprint $table) {
