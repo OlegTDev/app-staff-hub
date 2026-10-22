@@ -51,6 +51,7 @@ class DocumentSanatoriumRequest extends FormRequest
             'arrival_date_to' => ['date', 'required_if_declined:any_date_during_vacation', Rule::date()->format('Y-m-d')],
             'app_date' => ['required', 'date', Rule::date()->format('Y-m-d')],
             'agree' => ['accepted'],
+            'send' => ['boolean'],
         ];
     }
 
