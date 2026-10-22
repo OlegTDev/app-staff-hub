@@ -9,6 +9,7 @@ use App\Http\Resources\DocumentSanatoriumResource;
 use App\Http\Resources\SanatoriumResource;
 use App\Models\Dictionary\Sanatorium;
 use App\Models\Sanatorium\DocumentSanatorium;
+use App\Models\Sanatorium\DocumentSanatoriumStatus;
 use App\Services\DocumentSanatoriumService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -73,25 +74,12 @@ class DocumentSanatoriumController extends Controller
             ];
         }
 
+        $status = $validated['send'] ? DocumentSanatoriumStatus::SENDED : DocumentSanatoriumStatus::NEW;
         $documentSanatorium = DocumentSanatorium::create($validated);
         $documentSanatorium->sanatoriumsAdditional()->sync($syncData);
-        $documentSanatorium->document()->create(['user_id' => auth()->id(), 'status' => 'new']);
+        $documentSanatorium->document()->create(['user_id' => auth()->id(), 'status' => $status]);
 
         return to_route('documents.sanatoriums.index')->with('success', 'Заявление создано!');
-    }
-
-    /**
-     * @route GET /documents/sanatoriums/{sanatorium}
-     */
-    public function show(DocumentSanatorium $documentSanatorium)
-    {
-        $documentSanatorium->load(['document']);
-        $sanatoriumApplicationResource = DocumentSanatoriumResource::make($documentSanatorium);
-        return Inertia::render('Documents/Sanatoriums/Show', [
-            'labels' => config('labels.document_sanatorium'),
-            'sanatoriumApplication' => $sanatoriumApplicationResource,
-            'pdfUrl' => Inertia::defer(fn() => route('documents.pdf', ['document' => $documentSanatorium->document->id])),
-        ]);
     }
 
     /**
@@ -118,7 +106,6 @@ class DocumentSanatoriumController extends Controller
     public function update(DocumentSanatoriumRequest $request, DocumentSanatorium $documentSanatorium): RedirectResponse
     {
         $validated = $request->validated();
-        $data = $validated;
 
         $syncData = [];
         if (isset($validated['sanatoriumsAdditional'])) {
@@ -129,8 +116,10 @@ class DocumentSanatoriumController extends Controller
             }
         }
 
-        $documentSanatorium->update($data);
+        $status = $validated['send'] ? DocumentSanatoriumStatus::SENDED : DocumentSanatoriumStatus::NEW;
+        $documentSanatorium->update($validated);
         $documentSanatorium->sanatoriumsAdditional()->sync($syncData);
+        $documentSanatorium->document->update(['status' => $status]);
 
         return to_route('documents.sanatoriums.index')
             ->with('success', 'Заявление обновлено.');

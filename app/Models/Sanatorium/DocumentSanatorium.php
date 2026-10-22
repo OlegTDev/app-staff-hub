@@ -31,7 +31,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @property bool $any_date_during_vacation
  * @property \Carbon\CarbonInterface|null $arrival_date_from
  * @property \Carbon\CarbonInterface|null $arrival_date_to
- * @property string $status
  *
  * @property Document $document
  * @property-read Sanatorium $sanatorium
@@ -41,7 +40,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
     'to_organization', 'to_manager_name', 'sanatorium_id', 'app_date', 'user_name', 'user_organization',
     'user_department', 'user_position', 'user_place', 'user_telephone_inner', 'user_telephone_outer',
     'user_relatives', 'vacation_start', 'vacation_end', 'any_date_during_vacation', 'arrival_date_from',
-    'arrival_date_to', 'status',
+    'arrival_date_to',
 ])]
 #[Table('document_sanatoriums')]
 class DocumentSanatorium extends Model implements RenderableDocument
