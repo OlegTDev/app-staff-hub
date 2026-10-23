@@ -55,7 +55,7 @@ export function Sidebar() {
             <div className="sidebar-collapsed-brand">
               <div className="sidebar-collapsed-brand__logoLayer">
                 <img
-                  src="https://img.icons8.ru/color/1200/ios-photos.jpg"
+                  src="/favicon.ico"
                   alt="logo"
                   width={24}
                   height={24}
@@ -88,7 +88,7 @@ export function Sidebar() {
               }}
             >
               <img
-                src="https://img.icons8.ru/color/1200/ios-photos.jpg"
+                src="/favicon.ico"
                 alt="logo"
                 width={24}
                 height={24}
@@ -106,11 +106,11 @@ export function Sidebar() {
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                   fontWeight: 600,
-                  fontSize: token.fontSizeLG,
+                  fontSize: token.fontSizeSM,
                   textTransform: "uppercase",
                 }}
               >
-                My Application Name
+                Сервис заявлений
               </div>
               {!omitBrandToggle ? (
                 <Button
@@ -138,7 +138,7 @@ export function Sidebar() {
       collapsible
       collapsed={collapsed}
       trigger={null}
-      width={240}
+      width={320}
       collapsedWidth={64}
       breakpoint="lg"
       onBreakpoint={(broken) => {

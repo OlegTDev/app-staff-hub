@@ -8,7 +8,7 @@ require __DIR__ . '/web/auth.php';
 
 Route::middleware('auth')->group(static function() {
     Route::get('/', static function () {
-        return Inertia::render('Welcome');
+        return Inertia::render('Main/Index');
     })->name('main');
 
     require __DIR__ . '/web/users.php';
