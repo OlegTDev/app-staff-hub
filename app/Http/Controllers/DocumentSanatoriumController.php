@@ -9,15 +9,16 @@ use App\Http\Resources\DocumentSanatoriumResource;
 use App\Http\Resources\SanatoriumResource;
 use App\Models\Dictionary\Sanatorium;
 use App\Models\Sanatorium\DocumentSanatorium;
-use App\Models\Sanatorium\DocumentSanatoriumStatus;
+use App\Models\DocumentStatus;
 use App\Services\DocumentSanatoriumService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DocumentSanatoriumController extends Controller
 {
-    use BuildsListQuery;
+    use AuthorizesRequests, BuildsListQuery;
 
     /**
      * @route GET /documents/sanatoriums
@@ -26,8 +27,9 @@ class DocumentSanatoriumController extends Controller
     {
         /** @var \App\Models\User */
         $user = auth()->user();
-        $isModerator = $user->hasRoles(UserRole::ADMIN->value, UserRole::SANATORIUM_MODERATOR->value);
-        $query = $documentSanatoriumService->getApplicationsBuilder($isModerator, $user->id);
+        $isModerator = $user->hasRoles(UserRole::SANATORIUM_MODERATOR->value);
+        $isAdmin = $user->hasRole(UserRole::ADMIN->value);
+        $query = $documentSanatoriumService->getApplicationsBuilder($isModerator, $isAdmin, $user->id);
         $query->with(['sanatoriumsAdditional', 'document']);
 
         $paginatedData = $this->getPaginatedData(
@@ -74,7 +76,7 @@ class DocumentSanatoriumController extends Controller
             ];
         }
 
-        $status = $validated['send'] ? DocumentSanatoriumStatus::SENDED : DocumentSanatoriumStatus::NEW;
+        $status = $validated['send'] ? DocumentStatus::SENDED : DocumentStatus::NEW;
         $documentSanatorium = DocumentSanatorium::create($validated);
         $documentSanatorium->sanatoriumsAdditional()->sync($syncData);
         $documentSanatorium->document()->create(['user_id' => auth()->id(), 'status' => $status]);
@@ -87,6 +89,8 @@ class DocumentSanatoriumController extends Controller
      */
     public function edit(DocumentSanatorium $documentSanatorium): \Inertia\Response
     {
+        $this->authorize('update', $documentSanatorium);
+
         $documentSanatorium->load(['sanatorium', 'sanatoriumsAdditional']);
 
         return Inertia::render('Documents/Sanatoriums/Edit', [
@@ -116,13 +120,15 @@ class DocumentSanatoriumController extends Controller
             }
         }
 
-        $status = $validated['send'] ? DocumentSanatoriumStatus::SENDED : DocumentSanatoriumStatus::NEW;
+        $status = $validated['send'] ? DocumentStatus::SENDED : DocumentStatus::NEW;
         $documentSanatorium->update($validated);
         $documentSanatorium->sanatoriumsAdditional()->sync($syncData);
         $documentSanatorium->document->update(['status' => $status]);
 
+        $message = $status === DocumentStatus::SENDED ? 'Заявление отправлено.' : 'Заявление обновлено.';
+
         return to_route('documents.sanatoriums.index')
-            ->with('success', 'Заявление обновлено.');
+            ->with('success', $message);
     }
 
     /**
@@ -130,6 +136,8 @@ class DocumentSanatoriumController extends Controller
      */
     public function destroy(DocumentSanatorium $documentSanatorium): RedirectResponse
     {
+        $this->authorize('delete', $documentSanatorium);
+
         $documentSanatorium->document()->delete();
         $documentSanatorium->delete();
 

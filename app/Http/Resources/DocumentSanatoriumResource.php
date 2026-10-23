@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * @mixin \App\Models\Sanatorium\DocumentSanatorium
@@ -17,6 +18,8 @@ class DocumentSanatoriumResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $request->user();
+
         return [
             'id' => $this->id,
             'sanatorium_id' => $this->sanatorium_id,
@@ -35,7 +38,9 @@ class DocumentSanatoriumResource extends JsonResource
             'any_date_during_vacation' => $this->any_date_during_vacation,
             'arrival_date_from' => $this->arrival_date_from,
             'arrival_date_to' => $this->arrival_date_to,
-            'status' => $this->status,
+
+            'can_edit' => $user !== null && Gate::forUser($user)->allows('update', $this->resource),
+            'can_delete' => $user !== null && Gate::forUser($user)->allows('delete', $this->resource),
 
             'document' => $this->whenLoaded('document', fn() => DocumentResource::make($this->document)),
             'sanatorium' => $this->whenLoaded('sanatorium', fn() => SanatoriumResource::make($this->sanatorium)),

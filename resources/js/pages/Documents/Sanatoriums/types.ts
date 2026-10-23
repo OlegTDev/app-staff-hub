@@ -10,13 +10,17 @@ export interface Relative {
 
 export interface Document {
   id: number;
+  user_id: number;
   status: string;
+  is_author: boolean;
   created_at: string;
   updated_at: string;
 };
 
 export interface Application {
   id: number;
+  can_edit: boolean;
+  can_delete: boolean;
   sanatorium_id: number;
   to_organization: string;
   to_manager_name: string;
@@ -34,7 +38,6 @@ export interface Application {
   any_date_during_vacation: boolean;
   arrival_date_from: string|undefined;
   arrival_date_to: string|undefined;
-  status: string;
   create_at: string;
   updated_at: string;
   sanatoriumsAdditional: Sanatorium[];
@@ -42,6 +45,7 @@ export interface Application {
 }
 
 type RelativeValidationLabels = {
+  status: string;
   "user_relatives.*.type": string;
   "user_relatives.*.name": string;
   "user_relatives.*.birthdate": string;

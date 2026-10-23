@@ -17,8 +17,11 @@ class DocumentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var ?\App\Models\User */
+        $user = $request->user();
         return [
             'id' => $this->id,
+            'user_id' => $this->user_id,
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

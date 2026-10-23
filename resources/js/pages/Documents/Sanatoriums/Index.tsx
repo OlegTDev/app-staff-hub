@@ -1,7 +1,7 @@
 import { BaseFilters, PaginatedData } from "@/types/pagination";
 import { Head, router } from "@inertiajs/react";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Button, Drawer, Popconfirm, Space, Table, Tooltip } from "antd";
+import { Button, Drawer, Popconfirm, Space, Table, Tag, Tooltip } from "antd";
 import { Application, ApplicationLabels } from "./types";
 import { usePageBreadcrumbs } from "@/hooks/usePageBreadcrumbs";
 import Title from "@/Shared/Title";
@@ -58,9 +58,23 @@ export default function Index({ items, query, labels, isModerator }: PageProps):
   const pdfUrl = selectedDocumentId ? route('documents.pdf', { document: selectedDocumentId }) : '';
 
   const columns = [
-    { dataIndex: 'id', title: labels.id },
-    { dataIndex: 'app_date', title: labels.app_date, render: (value?: string) => formatDate(value) },
     { dataIndex: 'user_name', title: labels.user_name, hidden: !isModerator },
+    { dataIndex: 'user_department', title: labels.user_department, hidden: !isModerator },
+    { dataIndex: 'user_telephone_inner', title: labels.user_telephone_inner, hidden: !isModerator },
+    { title: labels.app_date, render: (record: Application) => formatDate(record.app_date) },
+    {
+      title: labels.status,
+      render: (record: Application) => {
+        const status = record.document.status;
+        if (status === 'new') {
+          return <Tag color="default">Черновик</Tag>;
+        } else if (status === 'sended') {
+          return <Tag color="green">Отправлено</Tag>;
+        } else {
+          return <Tag color="red">Не известный статус: {status}</Tag>;
+        }
+      },
+    },
     {
       title: 'Управление',
       render: (record: Application) => (
@@ -68,18 +82,22 @@ export default function Index({ items, query, labels, isModerator }: PageProps):
           <Tooltip title="Просмотр заявления">
             <Button icon={<EyeOutlined />} onClick={() => handleView(record)} />
           </Tooltip>
-          <Tooltip title="Редактирование">
-            <Button icon={<EditOutlined />} onClick={() => handleEdit(record.id)} />
-          </Tooltip>
-          <Popconfirm
-            title="Удаление заявления"
-            description="Вы уверены, что хотите удалить это заявление?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Да"
-            cancelText="Нет"
-          >
-            <Button icon={<DeleteOutlined />} danger />
-          </Popconfirm>
+          {record.can_edit && (
+            <Tooltip title="Редактирование">
+              <Button icon={<EditOutlined />} onClick={() => handleEdit(record.id)} />
+            </Tooltip>
+          )}
+          {record.can_delete && (
+            <Popconfirm
+              title="Удаление заявления"
+              description="Вы уверены, что хотите удалить это заявление?"
+              onConfirm={() => handleDelete(record.id)}
+              okText="Да"
+              cancelText="Нет"
+            >
+              <Button icon={<DeleteOutlined />} danger />
+            </Popconfirm>
+          )}
         </Space>
       ),
       width: 85,
