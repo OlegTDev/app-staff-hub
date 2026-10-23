@@ -95,7 +95,7 @@
             $totalVacationPackages = count($data->getUserRelatives()) + 1;
         @endphp
         Прошу выделить {{ $totalVacationPackages }} {{ trans_choice('documents.count_vacation_packages', $totalVacationPackages, ['count' => $totalVacationPackages]) }}
-        мне{{ $totalVacationPackages > 1 ? ' и моей семье' : '' }}:
+        мне{{ $totalVacationPackages > 1 ? ' и моей семье:' : '' }}
     </div>
 
     @foreach($data->getUserRelatives() as $index => $member)
