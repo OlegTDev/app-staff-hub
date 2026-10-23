@@ -13,13 +13,13 @@ export const menuConfig: MenuItemConfig[] = [
     label: 'Главная',
     route: route('main'),
     path: '/',
-    roles: ['admin'],
   },
   {
     key: 'users',
     label: 'Пользователи',
     route: route('users.index'),
     path: '/users',
+    roles: ['admin'],
   },
   {
     key: 'dictionary',
