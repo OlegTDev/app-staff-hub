@@ -1,4 +1,4 @@
-import { Empty, Input, Typography, Form, DatePicker } from "antd";
+import { Empty, Input, Typography, Form, DatePicker, Alert } from "antd";
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { ApplicationLabels, Relative } from "../../types";
 import dayjs from "dayjs";
@@ -19,6 +19,7 @@ export default function EmployeeDataRelatives({ labels, relatives, handleUpdate,
   return (
     relatives && relatives.length > 0 ? (
       <Typography>
+        <Alert title="Заполняйте в дательном падеже" />
         <table>
           <thead>
             <tr>

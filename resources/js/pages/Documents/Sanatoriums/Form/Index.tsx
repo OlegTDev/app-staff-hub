@@ -78,7 +78,7 @@ export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord, sett
     arrival_date_from: dateToStr(model?.arrival_date_from),
     arrival_date_to: dateToStr(model?.arrival_date_to),
     sanatoriumsAdditional: model?.sanatoriumsAdditional.map(s => s.id) || [],
-    agree: model?.agree || false,
+    agree: false,
     _currentStep: initialStep,
     send: false,
   });
