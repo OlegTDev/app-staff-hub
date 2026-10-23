@@ -24,8 +24,9 @@ class SanatoriumApplicationController extends Controller
     {
         /** @var \App\Models\User */
         $user = auth()->user();
-        $isModerator = $user->hasRoles(UserRole::ADMIN->value, UserRole::SANATORIUM_MODERATOR->value);
-        $query = $sanatoriumApplicationService->getApplicationsBuilder($isModerator, $user->id);
+        $isModerator = $user->hasRoles(UserRole::SANATORIUM_MODERATOR->value);
+        $isAdmin = $user->hasRole(UserRole::ADMIN->value);
+        $query = $sanatoriumApplicationService->getApplicationsBuilder($isModerator, $isAdmin, $user->id);
         $query->with(['sanatoriumsAdditional']);
 
         $paginatedData = $this->getPaginatedData(
