@@ -78,4 +78,12 @@ class LoginRequest extends FormRequest
         return Str::lower($this->input('username')).'|'.$this->ip();
     }
 
+    public function attributes(): array
+    {
+        return [
+            'username' => 'Логин',
+            'password' => 'Пароль',
+        ];
+    }
+
 }

@@ -27,6 +27,7 @@ class DocumentSanatoriumResource extends JsonResource
             'to_manager_name' => $this->to_manager_name,
             'app_date' => $this->app_date,
             'user_name' => $this ->user_name,
+            'user_organization' => $this->user_organization,
             'user_department' => $this->user_department,
             'user_position' => $this->user_position,
             'user_place' => $this->user_place,

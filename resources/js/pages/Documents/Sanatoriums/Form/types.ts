@@ -24,7 +24,8 @@ export type FormVacationsFields = {
   vacation_end?: string;
 };
 
-export type FormFields = FormEmployeeFields &
+export type FormFields =
+  FormEmployeeFields &
   FormSanatoriumFields &
   FormVacationsFields & {
     to_organization?: string;

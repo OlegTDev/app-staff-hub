@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use App;
 use App\Http\Resources\UserResource;
-use App\Models\Role;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -45,7 +44,7 @@ class HandleInertiaRequests extends Middleware
                 /** @var \App\Models\User|null */
                 $user = $request->user();
                 if ($user !== null) {
-                    $user->load('roles');
+                    $user->load(['roles', 'torm']);
                     return ['user' => UserResource::make($user)];
                 }
                 return [];

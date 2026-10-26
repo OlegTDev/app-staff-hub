@@ -6,6 +6,7 @@ return [
     'app_date' => 'Дата заявления',
     'user' => 'Данные сотрудника',
     'user_name' => 'ФИО',
+    'user_organization' => 'Наименование организации',
     'user_department' => 'Отдел',
     'user_position' => 'Должность',
     'user_place' => 'Местонахождение',

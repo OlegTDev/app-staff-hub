@@ -5,6 +5,11 @@ export interface Role {
   description: string;
 }
 
+export interface Torm {
+  code: string;
+  name: string;
+}
+
 export interface User {
   id: number;
   name: string;
@@ -18,6 +23,7 @@ export interface User {
   torm_code?: string;
   created_at: string;
   updated_at: string;
+  torm?: Torm;
 
   roles: Role[];
 }
