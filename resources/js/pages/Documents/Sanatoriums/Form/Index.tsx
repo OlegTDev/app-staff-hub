@@ -64,11 +64,11 @@ export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord, sett
     to_manager_name: model?.to_manager_name ?? settings?.manager ?? '',
     sanatorium_id: model?.sanatorium_id ?? undefined,
     app_date: dateToStr(model?.app_date) ?? formatDateISO(dayjs()),
-    user_organization: model?.to_organization ?? '',
+    user_organization: model?.to_organization ?? user?.company ?? '',
     user_name: model?.user_name ?? user?.name ?? '',
     user_department: model?.user_department ?? user?.department ?? '',
     user_position: model?.user_position ?? user?.position ?? '',
-    user_place: model?.user_place ?? '',
+    user_place: model?.user_place ?? user?.torm?.name ?? '',
     user_telephone_inner: model?.user_telephone_inner ?? user?.telephone ?? '',
     user_telephone_outer: model?.user_telephone_outer ?? '',
     user_relatives: model?.user_relatives ?? [],
@@ -184,7 +184,7 @@ export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord, sett
                 <Input
                   placeholder={labels.to_organization}
                   value={data.to_organization}
-                  onChange={e => { setData('to_organization', e.target.value); setData('user_organization', e.target.value); }}
+                  onChange={e => setData('to_organization', e.target.value)}
                 />
               </FormItem>
             </Col>

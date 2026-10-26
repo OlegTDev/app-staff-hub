@@ -34,7 +34,7 @@ export default function EmployeeDataCard({ labels, data, errors, setData, dateFo
   return (
     <Card title="Данные сотрудника">
       <Row gutter={[12, 12]}>
-        {(['user_name', 'user_department', 'user_position', 'user_place', 'user_telephone_inner', 'user_telephone_outer'] as const).map((attribute) => (
+        {(['user_name', 'user_organization', 'user_department', 'user_position', 'user_place', 'user_telephone_inner', 'user_telephone_outer'] as const).map((attribute) => (
           <Col span={8} key={attribute}>
             <FormItem
               layout="vertical"

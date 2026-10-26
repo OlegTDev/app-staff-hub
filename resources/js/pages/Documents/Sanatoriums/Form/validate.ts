@@ -48,9 +48,10 @@ const validateUserData = (data: FormFields, setError: setErrorInertia, labels: A
   });
   const userDataValidateSchema = z.object({
     user_name: z.string().min(5, requiredTextFieldMessage(labels.user_name)),
-    user_department: z.string().min(5, requiredTextFieldMessage(labels.user_department)),
-    user_position: z.string().min(5, requiredTextFieldMessage(labels.user_position)),
-    user_place: z.string().min(5, requiredTextFieldMessage(labels.user_place)),
+    user_organization: z.string().min(2, requiredTextFieldMessage(labels.user_organization)),
+    user_department: z.string().min(2, requiredTextFieldMessage(labels.user_department)),
+    user_position: z.string().min(2, requiredTextFieldMessage(labels.user_position)),
+    user_place: z.string().min(2, requiredTextFieldMessage(labels.user_place)),
     user_telephone_inner: z.string().min(2, requiredTextFieldMessage(labels.user_telephone_inner)),
     user_telephone_outer: z.string().min(2, requiredTextFieldMessage(labels.user_telephone_outer)),
     user_relatives: z.array(userDataValidateRelativeSchema).optional().default([]),
