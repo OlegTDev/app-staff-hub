@@ -30,7 +30,7 @@ class DocumentSanatoriumController extends Controller
         $isModerator = $user->hasRoles(UserRole::SANATORIUM_MODERATOR->value);
         $isAdmin = $user->hasRole(UserRole::ADMIN->value);
         $query = $documentSanatoriumService->getApplicationsBuilder($isModerator, $isAdmin, $user->id);
-        $query->with(['sanatoriumsAdditional', 'document']);
+        $query->with(['sanatoriumsAdditional', 'document', 'sanatorium']);
 
         $paginatedData = $this->getPaginatedData(
             request: $request,
@@ -43,6 +43,7 @@ class DocumentSanatoriumController extends Controller
             ...$paginatedData,
             'labels' => config('labels.document_sanatorium'),
             'isModerator' => $isModerator,
+            'isAdmin' => $isAdmin,
         ]);
     }
 

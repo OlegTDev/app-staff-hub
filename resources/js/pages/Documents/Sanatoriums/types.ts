@@ -40,12 +40,12 @@ export interface Application {
   arrival_date_to: string|undefined;
   create_at: string;
   updated_at: string;
+  sanatorium: Sanatorium;
   sanatoriumsAdditional: Sanatorium[];
   document: Document;
 }
 
 type RelativeValidationLabels = {
-  status: string;
   "user_relatives.*.type": string;
   "user_relatives.*.name": string;
   "user_relatives.*.birthdate": string;
@@ -55,5 +55,10 @@ type RelativeValidationLabels = {
 export type ApplicationLabels = {
   [K in keyof Application]: string;
 } & {
+  status: string;
+  user: string;
   sanatorium: string;
+  sanatoriums: string;
+  vacation_period: string;
+  vacation_and_arrival_period: string;
 } & RelativeValidationLabels;

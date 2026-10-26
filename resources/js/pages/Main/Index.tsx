@@ -55,26 +55,6 @@ export default function MainIndex(): React.JSX.Element {
               </Link>
             </Space>
 
-            {/* <Divider />
-
-            <Row gutter={[16, 16]} justify="center" align="middle">
-              <Col span={12}>
-                <Link href={route("dictionary.sanatoriums.index")}>
-                  <Space>
-                    <ApartmentOutlined />
-                    <span>Посмотреть санатории</span>
-                  </Space>
-                </Link>
-              </Col>
-              <Col span={12}>
-                <Link href={route("documents.sanatoriums.index")}>
-                  <Space>
-                    <FileTextOutlined />
-                    <span>Заявления на санаторно-курортное лечение</span>
-                  </Space>
-                </Link>
-              </Col>
-            </Row> */}
           </Card>
         </Col>
       </Row>
