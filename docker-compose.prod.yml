@@ -1,0 +1,79 @@
+services:
+    nginx:
+        build:
+            context: ./
+            dockerfile: docker/prod/nginx/Dockerfile
+            args:
+                - REGISTRY=${REGISTRY}
+                - VERSION_TAG=${NGINX_TAG}
+        container_name: 86000-staff-hub-nginx
+        restart: unless-stopped
+        depends_on:
+            - php-fpm
+        networks:
+            - app-network
+            - web_network
+        volumes:
+            - storage_public_data:/app/public/storage:ro
+
+    php-fpm:
+        build:
+            context: ./
+            dockerfile: docker/prod/php-fpm/Dockerfile
+            args:
+                - REGISTRY=${REGISTRY}
+                - VERSION_TAG=${PHP_FPM_TAG}
+        restart: unless-stopped
+        volumes:
+            - assets_data:/app/public
+            - storage_public_data:/app/storage/app/public
+            - laravel_logs:/app/storage/logs
+            - laravel_framework:/app/storage/framework
+        depends_on:
+            - postgres
+        networks:
+            - app-network
+
+    php-cli:
+        build:
+            context: ./
+            dockerfile: docker/prod/php-cli/Dockerfile
+            args:
+                - REGISTRY=${REGISTRY}
+                - VERSION_TAG=${PHP_CLI_TAG}
+        volumes:
+            - laravel_logs:/app/storage/logs
+            - laravel_framework:/app/storage/framework
+        depends_on:
+            postgres:
+                condition: service_started
+        networks:
+            - app-network
+
+    postgres:
+        image: ${REGISTRY}/postgres:${POSTGRES_TAG}
+        restart: unless-stopped
+        shm_size: 128mb
+        environment:
+            POSTGRES_DB: ${DB_DATABASE}
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        ports:
+            - ${POSTGRES_PORT}:5432
+        volumes:
+            - postgres_data_app_staff_hub:/var/lib/postgresql
+        networks:
+            - app-network
+
+volumes:
+    postgres_data_app_staff_hub:
+    assets_data:
+    storage_public_data:
+    laravel_logs:
+    laravel_framework:
+
+networks:
+  app-network:
+    driver: bridge
+  web_network:
+    external: true
