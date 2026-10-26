@@ -1,26 +1,39 @@
 import { BaseFilters, PaginatedData } from "@/types/pagination";
 import { Head, router } from "@inertiajs/react";
-import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Button, Drawer, Popconfirm, Space, Table, Tag, Tooltip } from "antd";
+import { EyeOutlined, EditOutlined, DeleteOutlined, BankTwoTone, IdcardTwoTone, PhoneTwoTone, CalendarFilled, CalendarOutlined } from "@ant-design/icons";
+import { Button, Divider, Drawer, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { Application, ApplicationLabels } from "./types";
 import { usePageBreadcrumbs } from "@/hooks/usePageBreadcrumbs";
 import Title from "@/Shared/Title";
-import { formatDate } from "@/utils/dateHelpers";
+import { formatDate, formatRelative } from "@/utils/dateHelpers";
 import { useDataTable } from "@/hooks/useDataTable";
 import { useState } from "react";
 import { breadcrumbMain } from '@/pages/breadcrumbsMain';
 import { breadcrumbSanatorium } from './breadcrumbSanatorium';
 import { INIT_SCALE_SIZE, PdfPreview, ZoomControls } from './PdfPreview';
+import { Sanatorium } from "@/pages/Dictionary/Sanatorium/types";
 
 type PageProps = {
   items: PaginatedData<Application>;
   query: BaseFilters;
   labels: ApplicationLabels;
   isModerator: boolean;
+  isAdmin: boolean;
 }
 
-export default function Index({ items, query, labels, isModerator }: PageProps): React.JSX.Element {
-  const title = isModerator ? breadcrumbSanatorium.name : 'Мои заявления';
+const SanatoriumRender = ({ sanatorium }: {sanatorium: Sanatorium}) => {
+  return (<>
+    <Space orientation="vertical" size={0}>
+      <Text>{sanatorium.name}</Text>
+      <Text type='secondary'>({sanatorium.city})</Text>
+    </Space>
+  </>);
+};
+
+const { Text } = Typography;
+
+export default function Index({ items, query, labels, isModerator, isAdmin }: PageProps): React.JSX.Element {
+  const title = isModerator || isAdmin ? breadcrumbSanatorium.name : 'Мои заявления';
   const [pdfPreviewScale, setPdfPreviewScale] = useState(INIT_SCALE_SIZE);
 
   usePageBreadcrumbs([
@@ -58,9 +71,81 @@ export default function Index({ items, query, labels, isModerator }: PageProps):
   const pdfUrl = selectedDocumentId ? route('documents.pdf', { document: selectedDocumentId }) : '';
 
   const columns = [
-    { dataIndex: 'user_name', title: labels.user_name, hidden: !isModerator },
-    { dataIndex: 'user_department', title: labels.user_department, hidden: !isModerator },
-    { dataIndex: 'user_telephone_inner', title: labels.user_telephone_inner, hidden: !isModerator },
+    {
+      title: labels.user,
+      key: 'user_name',
+      dataIndex: 'user_name',
+      sorter: true,
+      render: (_: string, record: Application) => {
+        return (
+          <>
+            <Space orientation="vertical" size={0}>
+              <Text>{record.user_name}</Text>
+              {record.user_department && <Text type="secondary"><BankTwoTone style={{ marginRight: 5 }} />{record.user_department}</Text>}
+              {record.user_position && <Text type="secondary"><IdcardTwoTone style={{ marginRight: 5 }} /> {record.user_position}</Text>}
+              {record.user_telephone_inner && <Text type="secondary"><PhoneTwoTone style={{ marginRight: 5 }} /> {record.user_telephone_inner}</Text>}
+              <Text ellipsis>Количество путевок: {record.user_relatives.length + 1}</Text>
+            </Space>
+          </>
+        );
+      },
+    },
+    {
+      title: labels.sanatorium_id,
+      key: 'sanatorium_id',
+      dataIndex: 'sanatorium_id',
+      sorter: true,
+      render: (_: string, record: Application) => {
+        return (
+          <>
+            <SanatoriumRender sanatorium={record?.sanatorium} />
+          </>
+        );
+      },
+    },
+    {
+      title: labels.sanatoriumsAdditional,
+      key: 'sanatoriumsAdditional',
+      dataIndex: 'sanatoriumsAdditional',
+      sorter: true,
+      render: (_: string, record: Application) => {
+        if (record.sanatoriumsAdditional.length > 0) {
+          return <Space orientation="vertical">
+            {record.sanatoriumsAdditional.map((sanatorium) => (<SanatoriumRender key={sanatorium.id} sanatorium={sanatorium} />))}
+          </Space>;
+        }
+        return <>Не выбран</>;
+      },
+    },
+    {
+      title: labels.vacation_and_arrival_period,
+      key: 'vacation_start',
+      dataIndex: 'vacation_start',
+      sorter: true,
+      render: (_: string, record: Application) => {
+        return <>
+          <Space orientation="vertical">
+            <Text strong><CalendarOutlined /><span className='ml-2'> Отпуск:</span></Text>
+            <Space orientation="vertical" size={0}>
+              <Text>
+                {formatDate(record.vacation_start)} - {formatDate(record.vacation_end)}
+              </Text>
+              <Text type="secondary">({formatRelative(record.vacation_start)})</Text>
+            </Space>
+            <Divider size="small" />
+            <Text strong><CalendarOutlined /><span className='ml-2'> Период заезда:</span></Text>
+            {record.any_date_during_vacation ? <Text>Любая дата заезда</Text> :
+              <Space orientation="vertical" size={0}>
+                <Text>
+                  {formatDate(record.arrival_date_from)} - {formatDate(record.arrival_date_to)}
+                </Text>
+                <Text type="secondary">({formatRelative(record.arrival_date_from)})</Text>
+              </Space>
+            }
+          </Space>
+        </>;
+      },
+    },
     { title: labels.app_date, render: (record: Application) => formatDate(record.app_date) },
     {
       title: labels.status,
