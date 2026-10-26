@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function(Blueprint $table) {
             $table->string('torm_code', 10)->nullable();
-            $table->foreign('torm_code')->references('code')->on('torms')->onDelete('set null');
+            $table->foreign('torm_code');
         });
     }
 
