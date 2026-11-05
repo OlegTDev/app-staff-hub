@@ -12,6 +12,15 @@ export default defineConfig({
         }),
         react(),
     ],
+    build: {
+        target: [
+            'es2020',
+            'edge88',
+            'chrome87',
+            'firefox78',
+            'safari14',
+        ],
+    },
     server: {
         watch: {
             ignored: ['**/storage/framework/views/**'],
