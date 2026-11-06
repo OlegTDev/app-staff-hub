@@ -2,8 +2,24 @@ import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import { Alert, Button, Space, Spin } from "antd";
 import { useEffect, useState } from "react";
+
+// Polyfill для Math.sumPrecise (ES2023) — до импорта pdf.js
+if (!Math.sumPrecise) {
+  (Math as any).sumPrecise = function (numbers: number[]): number {
+    if (numbers.length === 0) return 0;
+    const positive = numbers.filter((n) => n > 0);
+    const negative = numbers.filter((n) => n < 0);
+    return (
+      positive.reduce((a, b) => a + b, 0) +
+      negative.reduce((a, b) => a + b, 0)
+    );
+  };
+}
+
 import { Document, Page, pdfjs } from "react-pdf";
 
+// Отключаем системные шрифты (их нет в браузере)
+pdfjs.GlobalWorkerOptions.useSystemFonts = false;
 
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?raw';
 
