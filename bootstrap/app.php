@@ -17,6 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class,
         ]);
+        $middleware->preventRequestForgery(except: [
+            'documents/sanatoriums/pdf-preview',
+        ]);
         $middleware->alias([
             'roles' => RolesMiddleware::class,
         ]);
