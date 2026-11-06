@@ -5,6 +5,7 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { MainLayout } from "./Layout/MainLayout";
 import { ConfigProvider } from "antd";
 import ruRU from "antd/locale/ru_RU";
+import "./bootstrap";
 
 
 createInertiaApp({
