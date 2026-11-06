@@ -17,6 +17,8 @@ class DomPdfGenerator
         $pdf = Pdf::loadView($template, $data);
         $pdf
             ->setPaper($paper, $orientation)
+            ->setOption('isFontSubsettingEnabled', true)
+            ->setOption('isHtml5ParserEnabled', true)
             ->setWarnings(Arr::get($options, 'warnings', false));
 
         $filename = Arr::get($options, 'filename', "$filename.pdf");
