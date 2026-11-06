@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url,
-).toString();
+import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?raw';
+
+const workerBlob = new Blob([workerSrc], { type: 'application/javascript' });
+const workerUrl = URL.createObjectURL(workerBlob);
+
+pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 
 export const INIT_SCALE_SIZE = 1.2;
 
