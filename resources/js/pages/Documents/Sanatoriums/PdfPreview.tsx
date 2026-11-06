@@ -127,7 +127,7 @@ export function PdfPreview({
       {isPdfLoading && <Spin description="Генерация документа..." size="large" />}
 
       {!isPdfLoading && pdfBlobUrl && (
-        <Document file={pdfBlobUrl} loading={<div>Генерация документа...</div>}>
+        <Document className="pdf-document" file={pdfBlobUrl} loading={<div>Генерация документа...</div>}>
           <Page
             pageNumber={1}
             scale={scale}
