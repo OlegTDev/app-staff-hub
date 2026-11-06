@@ -21,12 +21,17 @@ import { Document, Page, pdfjs } from "react-pdf";
 // Отключаем системные шрифты (их нет в браузере)
 pdfjs.GlobalWorkerOptions.useSystemFonts = false;
 
+// Локальный воркер через blob (обход MIME-типа .mjs)
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?raw';
 
 const workerBlob = new Blob([workerSrc], { type: 'application/javascript' });
 const workerUrl = URL.createObjectURL(workerBlob);
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+
+// Локальные cmaps для корректной кодировки кириллицы
+pdfjs.GlobalWorkerOptions.cMapUrl = '/build/cmaps/';
+pdfjs.GlobalWorkerOptions.cMapPacked = true;
 
 export const INIT_SCALE_SIZE = 1.2;
 
