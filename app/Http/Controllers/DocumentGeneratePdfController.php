@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\RenderableDocument;
+use App\Models\Dictionary\Sanatorium;
 use App\Models\Document;
 use App\Models\Sanatorium\DocumentSanatorium;
 use App\Services\Pdf\DomPdfGenerator;
@@ -34,6 +35,8 @@ class DocumentGeneratePdfController
     public function preview(Request $request, DomPdfGenerator $domPdfGenerator): Response
     {
         $documentSanatorium = new DocumentSanatorium($request->input());
+        $sanatoriumsAdditional = Sanatorium::whereIn('id', $request->input('sanatoriumsAdditional'))->get();
+        $documentSanatorium->setRelation('sanatoriumsAdditional', $sanatoriumsAdditional);
         return $domPdfGenerator->stream($documentSanatorium->getTemplateName(), ['data' => $documentSanatorium->getTemplateData()]);
     }
 }
