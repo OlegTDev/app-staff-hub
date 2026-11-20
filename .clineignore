@@ -1,0 +1,46 @@
+# Зависимости (главный пожиратель токенов)
+node_modules/
+vendor/
+
+# Скомпилированные бандлы, кэш и временные файлы
+public/build/
+public/hot
+dist/
+build/
+.next/
+.nuxt/
+.vite/
+bootstrap/cache/
+storage/framework/
+storage/logs/
+*.log
+
+# Lock-файлы (огромные по объёму, редко нужны агенту)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+composer.lock
+
+# Секреты и окружение (для безопасности ключей и паролей)
+.env
+.env.*
+*.pem
+*.key
+
+# Системные папки IDE и Git
+.git/
+.idea/
+.vscode/
+
+# Медиафайлы, шрифты и архивы
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.ico
+*.woff
+*.woff2
+*.ttf
+*.zip
+*.sql
