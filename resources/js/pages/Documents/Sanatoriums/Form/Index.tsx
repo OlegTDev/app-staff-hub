@@ -9,7 +9,7 @@ import { GLOBAL_DATE_FORMAT } from "@/constants/date";
 import dayjs from "dayjs";
 import { validate } from "./validate";
 import { useEffect, useRef, useState } from "react";
-import { INIT_SCALE_SIZE, PdfPreview, ZoomControls } from "../PdfPreview";
+import { PDF_PREVIEW_WIDTH, PdfPreview } from "../PdfPreview";
 import { SaveOutlined, SendOutlined } from "@ant-design/icons";
 
 const { Item: FormItem } = Form;
@@ -55,7 +55,6 @@ const STEPS = [
 export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord, settings }: FormProps): React.JSX.Element {
   const { user } = useAuth();
   const [isPdfPreviewOpen, setIsPdfPreviewOpen] = useState(false);
-  const [pdfPreviewScale, setPdfPreviewScale] = useState(INIT_SCALE_SIZE);
 
   const initialStep = model ? STEPS.length - 1 : 0;
 
@@ -330,7 +329,7 @@ export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord, sett
             title="Заявление"
             open={isPdfPreviewOpen}
             onClose={() => setIsPdfPreviewOpen(false)}
-            size={Math.max(600, pdfPreviewScale * 630)}
+            size={PDF_PREVIEW_WIDTH}
             destroyOnHidden
             extra={
               <Space>
@@ -338,11 +337,10 @@ export function Index({ labels, sanatoriums, model, actionUrl, isNewRecord, sett
                   <Button icon={<SaveOutlined />} onClick={() => handleSubmit()}>Сохранить как черновик</Button>
                   <Button icon={<SendOutlined />} type="primary" onClick={() => handleSubmit(true)}>Отправить заявление</Button>
                 </Space.Compact>
-                <ZoomControls key={1} scale={pdfPreviewScale} onScaleChange={setPdfPreviewScale} />
               </Space>
             }
           >
-            <PdfPreview url={route('documents.pdf-preview')} method="POST" data={data} scale={pdfPreviewScale} />
+            <PdfPreview url={route('documents.pdf-preview')} method="POST" data={data} />
           </Drawer>
 
           <FormItem

@@ -10,7 +10,7 @@ import { useDataTable } from "@/hooks/useDataTable";
 import { useState } from "react";
 import { breadcrumbMain } from '@/pages/breadcrumbsMain';
 import { breadcrumbSanatorium } from './breadcrumbSanatorium';
-import { INIT_SCALE_SIZE, PdfPreview, ZoomControls } from './PdfPreview';
+import { PDF_PREVIEW_WIDTH, PdfPreview } from './PdfPreview';
 import { Sanatorium } from "@/pages/Dictionary/Sanatorium/types";
 
 type PageProps = {
@@ -34,7 +34,6 @@ const { Text } = Typography;
 
 export default function Index({ items, query, labels, isModerator, isAdmin }: PageProps): React.JSX.Element {
   const title = isModerator || isAdmin ? breadcrumbSanatorium.name : 'Мои заявления';
-  const [pdfPreviewScale, setPdfPreviewScale] = useState(INIT_SCALE_SIZE);
 
   usePageBreadcrumbs([
     { title: breadcrumbMain.name, href: breadcrumbMain.link },
@@ -255,20 +254,19 @@ export default function Index({ items, query, labels, isModerator, isAdmin }: Pa
 
       <Drawer
         title="Просмотр заявления"
-        size={Math.max(600, pdfPreviewScale * 630)}
+        size={PDF_PREVIEW_WIDTH}
         placement="right"
         open={drawerVisible}
         onClose={handleCloseDrawer}
         destroyOnHidden
         extra={
           <Space>
-            <ZoomControls key={1} scale={pdfPreviewScale} onScaleChange={setPdfPreviewScale} />
             <Button key={2} onClick={() => window.open(pdfUrl, '_blank')}>Скачать</Button>
           </Space>
         }
       >
         {selectedDocumentId &&
-          <PdfPreview url={route('documents.pdf', { document: selectedDocumentId })} scale={pdfPreviewScale} />
+          <PdfPreview url={route('documents.pdf', { document: selectedDocumentId })} />
         }
       </Drawer>
     </>

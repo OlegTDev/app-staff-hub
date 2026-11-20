@@ -1,77 +1,23 @@
-import 'react-pdf/dist/Page/TextLayer.css';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import { Alert, Button, Space, Spin } from "antd";
+import { Alert, Spin } from "antd";
 import { useEffect, useState } from "react";
 
-// Polyfill для Math.sumPrecise (ES2023) — до импорта pdf.js
-if (!Math.sumPrecise) {
-  (Math as any).sumPrecise = function (numbers: number[]): number {
-    if (numbers.length === 0) return 0;
-    const positive = numbers.filter((n) => n > 0);
-    const negative = numbers.filter((n) => n < 0);
-    return (
-      positive.reduce((a, b) => a + b, 0) +
-      negative.reduce((a, b) => a + b, 0)
-    );
-  };
-}
-
-import { Document, Page, pdfjs } from "react-pdf";
-
-// Отключаем системные шрифты (их нет в браузере)
-pdfjs.GlobalWorkerOptions.useSystemFonts = false;
-
-// Локальный воркер через blob (обход MIME-типа .mjs)
-import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?raw';
-
-const workerBlob = new Blob([workerSrc], { type: 'application/javascript' });
-const workerUrl = URL.createObjectURL(workerBlob);
-
-pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
-
-// Локальные cmaps для корректной кодировки кириллицы
-pdfjs.GlobalWorkerOptions.cMapUrl = '/build/cmaps/';
-pdfjs.GlobalWorkerOptions.cMapPacked = true;
-
-export const INIT_SCALE_SIZE = 1.2;
-
-type ZoomControlsProps = {
-  scale: number;
-  initSize?: number;
-  onScaleChange: React.Dispatch<React.SetStateAction<number>>;
-};
-
-export const ZoomControls = ({
-  scale,
-  initSize = INIT_SCALE_SIZE,
-  onScaleChange,
-}: ZoomControlsProps): React.JSX.Element => {
-  const zoomIn = () => onScaleChange((prev) => Math.min(prev + 0.1, 3.0));
-  const zoomOut = () => onScaleChange((prev) => Math.max(prev - 0.1, 0.5));
-
-  return (
-    <Space>
-      <Space.Compact>
-        <Button onClick={zoomOut}>-</Button>
-        <Space.Addon>{Math.round((scale / initSize) * 100)}%</Space.Addon>
-        <Button onClick={zoomIn}>+</Button>
-      </Space.Compact>
-    </Space>
-  );
-};
+/** Ширина выдвижной панели предпросмотра (A4 при читаемом масштабе). */
+export const PDF_PREVIEW_WIDTH = 900;
 
 type PdfPreviewProps = {
   url: string;
   method?: "GET" | "POST";
-  data?: Record<string, any>;
-  scale?: number;
+  data?: Record<string, unknown>;
 };
 
+/**
+ * Предпросмотр PDF через встроенный просмотрщик браузера (PDFium).
+ * Не требует pdf.js и работает в старых Chromium (Edge 92 и новее).
+ */
 export function PdfPreview({
   url,
   method = "GET",
   data = {},
-  scale = INIT_SCALE_SIZE,
 }: PdfPreviewProps): React.JSX.Element {
 
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
@@ -85,6 +31,7 @@ export function PdfPreview({
 
     setIsPdfLoading(true);
     setLoadError('');
+    setPdfBlobUrl(null);
 
     let currentBlobUrl: string | null = null;
 
@@ -101,8 +48,12 @@ export function PdfPreview({
         return res.blob();
       })
       .then((blob) => {
-        // Создаем локальную ссылку для react-pdf
-        currentBlobUrl = URL.createObjectURL(blob);
+        // Встроенный просмотрщик открывает только blob с типом application/pdf
+        const pdfBlob = blob.type === 'application/pdf'
+          ? blob
+          : new Blob([blob], { type: 'application/pdf' });
+
+        currentBlobUrl = URL.createObjectURL(pdfBlob);
         setPdfBlobUrl(currentBlobUrl);
       })
       .catch((err) => {
@@ -127,14 +78,11 @@ export function PdfPreview({
       {isPdfLoading && <Spin description="Генерация документа..." size="large" />}
 
       {!isPdfLoading && pdfBlobUrl && (
-        <Document className="pdf-document" file={pdfBlobUrl} loading={<div>Генерация документа...</div>}>
-          <Page
-            pageNumber={1}
-            scale={scale}
-            renderTextLayer={true}
-            renderAnnotationLayer={true}
-          />
-        </Document>
+        <iframe
+          src={pdfBlobUrl}
+          title="Предпросмотр заявления"
+          style={{ width: '100%', height: '100%', minHeight: '75vh', border: 0 }}
+        />
       )}
     </>
   );

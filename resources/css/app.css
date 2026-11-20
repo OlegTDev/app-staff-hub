@@ -96,8 +96,3 @@
 body {
     margin: 0;
 }
-
-/* Шрифт для текстового слоя PDF */
-.pdf-document .textLayer span {
-    font-family: 'Golos Text', system-ui, -apple-system, sans-serif !important;
-}
