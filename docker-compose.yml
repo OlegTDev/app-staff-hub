@@ -27,6 +27,18 @@ services:
         depends_on:
             - postgres
 
+    queue-worker:
+        build:
+            dockerfile: ./docker/common/php-cli/Dockerfile
+            target: dev
+        command: php artisan queue:work --queue=mail,default --tries=5 --sleep=3
+        volumes:
+            - ./:/app
+        depends_on:
+            postgres:
+                condition: service_started
+        restart: unless-stopped
+
     postgres:
         image: postgres:18-alpine
         environment:

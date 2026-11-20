@@ -13,6 +13,7 @@
         "intervention/image": "^4.0",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
+        "php-amqplib/php-amqplib": "^3.7",
         "tightenco/ziggy": "^2.6"
     },
     "require-dev": {

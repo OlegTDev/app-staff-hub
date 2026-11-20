@@ -35,4 +35,20 @@ return [
         ],
     ],
 
+    'outbound_mail' => [
+        'recipient' => env('OUTBOUND_MAIL_RECIPIENT'),
+        'exchange' => env('OUTBOUND_MAIL_EXCHANGE', 'mail'),
+        'routing_key' => env('OUTBOUND_MAIL_ROUTING_KEY', 'mail.send'),
+        'queue' => env('OUTBOUND_MAIL_QUEUE', 'mail'),
+        'rabbitmq' => [
+            'host' => env('RABBITMQ_HOST', '127.0.0.1'),
+            'port' => (int) env('RABBITMQ_PORT', 5672),
+            'user' => env('RABBITMQ_USER', 'guest'),
+            'password' => env('RABBITMQ_PASSWORD', 'guest'),
+            'vhost' => env('RABBITMQ_VHOST', '/'),
+            'connection_timeout' => (float) env('RABBITMQ_CONNECTION_TIMEOUT', 5.0),
+            'read_write_timeout' => (float) env('RABBITMQ_READ_WRITE_TIMEOUT', 10.0),
+        ],
+    ],
+
 ];

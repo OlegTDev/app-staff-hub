@@ -50,6 +50,25 @@ services:
         networks:
             - app-network
 
+    queue-worker:
+        build:
+            context: ./
+            dockerfile: docker/prod/php-cli/Dockerfile
+            args:
+                - REGISTRY=${REGISTRY}
+                - VERSION_TAG=${PHP_CLI_TAG}
+        container_name: 86000-staff-hub-queue
+        restart: unless-stopped
+        command: php artisan queue:work --queue=mail,default --tries=5 --sleep=3
+        volumes:
+            - laravel_logs:/app/storage/logs
+            - laravel_framework:/app/storage/framework
+        depends_on:
+            postgres:
+                condition: service_started
+        networks:
+            - app-network
+
     postgres:
         image: ${REGISTRY}/postgres:${POSTGRES_TAG}
         restart: unless-stopped
