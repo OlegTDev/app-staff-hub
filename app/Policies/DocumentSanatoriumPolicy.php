@@ -31,6 +31,14 @@ class DocumentSanatoriumPolicy
     }
 
     /**
+     * Determine whether the user can resend the document.
+     */
+    public function resend(User $user, DocumentSanatorium $documentSanatorium): bool
+    {
+        return $user->hasRole(UserRole::ADMIN->value) || $user->hasRole(UserRole::SANATORIUM_MODERATOR->value);
+    }
+
+    /**
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, DocumentSanatorium $documentSanatorium): bool

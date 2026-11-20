@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Sanatorium\SendSanatoriumApplicationAction;
 use App\Enums\UserRole;
 use App\Http\Controllers\Traits\BuildsListQuery;
 use App\Http\Requests\DocumentSanatoriumRequest;
 use App\Http\Resources\DocumentSanatoriumResource;
 use App\Http\Resources\SanatoriumResource;
 use App\Models\Dictionary\Sanatorium;
+use App\Models\Document;
 use App\Models\Sanatorium\DocumentSanatorium;
 use App\Models\DocumentStatus;
 use App\Services\DocumentSanatoriumService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class DocumentSanatoriumController extends Controller
@@ -30,7 +33,7 @@ class DocumentSanatoriumController extends Controller
         $isModerator = $user->hasRoles(UserRole::SANATORIUM_MODERATOR->value);
         $isAdmin = $user->hasRole(UserRole::ADMIN->value);
         $query = $documentSanatoriumService->getApplicationsBuilder($isModerator, $isAdmin, $user->id);
-        $query->with(['sanatoriumsAdditional', 'document', 'sanatorium']);
+        $query->with(['sanatoriumsAdditional', 'document.latestDelivery', 'sanatorium']);
 
         $paginatedData = $this->getPaginatedData(
             request: $request,
@@ -65,10 +68,11 @@ class DocumentSanatoriumController extends Controller
 
     /**
      * @route POST /documents/sanatoriums
-     * @todo Вынести в сервис
      */
-    public function store(DocumentSanatoriumRequest $request): RedirectResponse
-    {
+    public function store(
+        DocumentSanatoriumRequest $request,
+        SendSanatoriumApplicationAction $sendAction,
+    ): RedirectResponse {
         $validated = $request->validated();
         $syncData = [];
         foreach ($validated['sanatoriumsAdditional'] as $index => $id) {
@@ -78,9 +82,20 @@ class DocumentSanatoriumController extends Controller
         }
 
         $status = $validated['send'] ? DocumentStatus::SENDED : DocumentStatus::NEW;
-        $documentSanatorium = DocumentSanatorium::create($validated);
-        $documentSanatorium->sanatoriumsAdditional()->sync($syncData);
-        $documentSanatorium->document()->create(['user_id' => auth()->id(), 'status' => $status]);
+
+        DB::transaction(function () use ($validated, $syncData, $status, $sendAction): void {
+            $documentSanatorium = DocumentSanatorium::create($validated);
+            $documentSanatorium->sanatoriumsAdditional()->sync($syncData);
+            $document = new Document([
+                'user_id' => auth()->id(),
+                'status' => $status,
+            ]);
+            $documentSanatorium->document()->save($document);
+
+            if ($status === DocumentStatus::SENDED) {
+                $sendAction->execute($document);
+            }
+        });
 
         return to_route('documents.sanatoriums.index')->with('success', 'Заявление создано!');
     }
@@ -92,7 +107,7 @@ class DocumentSanatoriumController extends Controller
     {
         $this->authorize('update', $documentSanatorium);
 
-        $documentSanatorium->load(['sanatorium', 'sanatoriumsAdditional']);
+        $documentSanatorium->load(['sanatorium', 'sanatoriumsAdditional', 'document.latestDelivery']);
 
         return Inertia::render('Documents/Sanatoriums/Edit', [
             'labels' => config('labels.document_sanatorium'),
@@ -108,8 +123,11 @@ class DocumentSanatoriumController extends Controller
     /**
      * @route PUT /documents/sanatoriums/{documentSanatorium}
      */
-    public function update(DocumentSanatoriumRequest $request, DocumentSanatorium $documentSanatorium): RedirectResponse
-    {
+    public function update(
+        DocumentSanatoriumRequest $request,
+        DocumentSanatorium $documentSanatorium,
+        SendSanatoriumApplicationAction $sendAction,
+    ): RedirectResponse {
         $validated = $request->validated();
 
         $syncData = [];
@@ -122,14 +140,44 @@ class DocumentSanatoriumController extends Controller
         }
 
         $status = $validated['send'] ? DocumentStatus::SENDED : DocumentStatus::NEW;
-        $documentSanatorium->update($validated);
-        $documentSanatorium->sanatoriumsAdditional()->sync($syncData);
-        $documentSanatorium->document->update(['status' => $status]);
+        $wasSent = $documentSanatorium->document->status === DocumentStatus::SENDED;
+
+        DB::transaction(function () use ($documentSanatorium, $validated, $syncData, $status, $wasSent, $sendAction): void {
+            $documentSanatorium->update($validated);
+            $documentSanatorium->sanatoriumsAdditional()->sync($syncData);
+            $documentSanatorium->document->update(['status' => $status]);
+
+            if ($status === DocumentStatus::SENDED && !$wasSent) {
+                $sendAction->execute($documentSanatorium->document);
+            }
+        });
 
         $message = $status === DocumentStatus::SENDED ? 'Заявление отправлено.' : 'Заявление обновлено.';
 
         return to_route('documents.sanatoriums.index')
             ->with('success', $message);
+    }
+
+    /**
+     * @route POST /documents/sanatoriums/{documentSanatorium}/resend
+     */
+    public function resend(
+        DocumentSanatorium $documentSanatorium,
+        SendSanatoriumApplicationAction $sendAction,
+    ): RedirectResponse {
+        $this->authorize('resend', $documentSanatorium);
+
+        $document = $documentSanatorium->document;
+
+        if ($document->status !== DocumentStatus::SENDED) {
+            return to_route('documents.sanatoriums.index')
+                ->with('error', 'Повторная отправка доступна только для отправленных заявлений.');
+        }
+
+        $sendAction->resend($document);
+
+        return to_route('documents.sanatoriums.index')
+            ->with('success', 'Письмо повторно передано в сервис отправки.');
     }
 
     /**
