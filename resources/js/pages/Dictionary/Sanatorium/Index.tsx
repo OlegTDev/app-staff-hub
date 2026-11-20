@@ -2,14 +2,6 @@ import { PaginatedData } from "@/types/pagination";
 import { Sanatorium, SanatoriumLabels } from "./types";
 import { Head, router } from "@inertiajs/react";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  IconDots,
-  IconEdit,
-  IconFileX,
-  IconLibraryPhoto,
-  IconTrash,
-  IconUpload,
-} from "@tabler/icons-react";
 import getSvgPlaceholder from "@/Shared/SvgPlaceholder";
 import { useRef, useState } from "react";
 import Title from "@/Shared/Title";
@@ -38,6 +30,14 @@ export default function Index({ items }: PageProps): React.JSX.Element {
 
   const handleSanatoriumCreate = () => {
     router.get(route("dictionary.sanatoriums.create"));
+  };
+
+  const handleSanatoriumShow = (id: number) => {
+    router.get(route("dictionary.sanatoriums.show", { sanatorium: id }));
+  };
+
+  const stopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -81,7 +81,7 @@ export default function Index({ items }: PageProps): React.JSX.Element {
 
   const cardActions = (id: number): React.ReactNode[] => {
     const actions: React.ReactNode[] = [
-      <Button key="1" type="primary" onClick={() => router.get(route('dictionary.sanatoriums.show', { sanatorium: id }))}>Подробнее</Button>,
+      // <Button key="1" type="primary" onClick={() => handleSanatoriumShow(id)}>Подробнее</Button>,
     ];
     if (isAuthor) {
       actions.push(
@@ -92,14 +92,14 @@ export default function Index({ items }: PageProps): React.JSX.Element {
           ]},
           { type: 'divider' },
           { key: '1', label: 'Главное изображение', type: 'group', children: [
-          {
-            key: '1-1',
-            label: 'Загрузить',
-            onClick: () => {
-              setSanatoriumId(id);
-              fileInputRef.current?.click();
+            {
+              key: '1-1',
+              label: 'Загрузить',
+              onClick: () => {
+                setSanatoriumId(id);
+                fileInputRef.current?.click();
+              },
             },
-          },
             { key: '1-2', label: 'Удалить', danger: true, onClick: () => handleImageDelete(id) },
           ]},
           { type: 'divider' },
@@ -113,7 +113,11 @@ export default function Index({ items }: PageProps): React.JSX.Element {
       );
     }
 
-    return actions;
+    return actions.map((action, index) => (
+      <span key={index} onClick={stopPropagation}>
+        {action}
+      </span>
+    ));
   };
 
   return (
@@ -135,9 +139,11 @@ export default function Index({ items }: PageProps): React.JSX.Element {
             <Col span={8} key={sanatorium.id}>
               <Card
                 type="inner"
+                hoverable
+                style={{ cursor: "pointer" }}
+                onClick={() => handleSanatoriumShow(sanatorium.id)}
                 cover={(
                   <SafeImage
-                    // draggable={false}
                     src={sanatorium.photo_thumbnail}
                     fallback={getSvgPlaceholder({ text: "Изображение не загружено" })}
                   />
@@ -149,7 +155,7 @@ export default function Index({ items }: PageProps): React.JSX.Element {
                   {sanatorium.description}
                 </div>
               </Card>
-          </Col>
+            </Col>
           ))}
         </Row>
       ) : (
