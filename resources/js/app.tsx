@@ -1,3 +1,13 @@
+// Polyfill для Object.hasOwn (ES2022) — нужен для Edge < 90 и старых окружений
+if (!Object.hasOwn) {
+  Object.hasOwn = function (obj: unknown, prop: string | symbol): boolean {
+    return Object.prototype.hasOwnProperty.call(
+      obj as Record<string, unknown>,
+      prop,
+    );
+  };
+}
+
 import "../css/app.css";
 import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
@@ -6,7 +16,6 @@ import { MainLayout } from "./Layout/MainLayout";
 import { ConfigProvider } from "antd";
 import ruRU from "antd/locale/ru_RU";
 import "./bootstrap";
-
 
 createInertiaApp({
   title: (title) => title,
@@ -33,13 +42,13 @@ createInertiaApp({
         locale={ruRU}
         theme={{
           token: {
-            colorBgLayout: '#ffffff',
+            colorBgLayout: "#ffffff",
             fontFamily: "'Golos Text', system-ui, -apple-system, sans-serif",
           },
         }}
       >
         <App {...props} />
-      </ConfigProvider>
+      </ConfigProvider>,
     );
   },
   progress: {
