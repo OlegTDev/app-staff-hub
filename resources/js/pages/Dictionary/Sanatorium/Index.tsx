@@ -79,10 +79,8 @@ export default function Index({ items }: PageProps): React.JSX.Element {
     });
   };
 
-  const cardActions = (id: number): React.ReactNode[] => {
-    const actions: React.ReactNode[] = [
-      // <Button key="1" type="primary" onClick={() => handleSanatoriumShow(id)}>Подробнее</Button>,
-    ];
+  const cardActions = (id: number): React.ReactNode[] | undefined => {
+    const actions: React.ReactNode[] = [];
     if (isAuthor) {
       actions.push(
         <Dropdown menu={{ items: [
@@ -111,6 +109,10 @@ export default function Index({ items }: PageProps): React.JSX.Element {
           <Button key="settings" icon={<SettingOutlined />} />
         </Dropdown>
       );
+    }
+
+    if (actions.length === 0) {
+      return undefined;
     }
 
     return actions.map((action, index) => (
