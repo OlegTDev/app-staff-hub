@@ -8,12 +8,13 @@ RUN apk add --no-cache \
     && apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         unzip \
+        linux-headers \
         libpng-dev \
         libzip-dev \
         libpq-dev \
         openldap-dev \
         zlib-dev \
-    && docker-php-ext-install -j$(nproc) pdo pdo_pgsql pgsql ldap gd zip \
+    && docker-php-ext-install -j$(nproc) pdo pdo_pgsql pgsql ldap gd zip sockets \
     && apk del .build-deps
 
 ARG USER_ID=1000
