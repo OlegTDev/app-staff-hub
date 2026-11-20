@@ -1,24 +1,11 @@
-// Polyfill для Iterator.prototype.join (es-toolkit / ES2018) — нужен для Edge < 90 и старых окружений
-if (typeof Iterator !== "undefined" && typeof Iterator.prototype.join !== "function") {
-    Iterator.prototype.join = function (separator: string): string {
-        const result: unknown[] = [];
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const self = this as Iterator<unknown>;
-        for (const item of self) {
-            result.push(item);
-        }
-        return result.join(separator);
-    };
-}
-
 // Polyfill для Object.hasOwn (ES2022) — нужен для Edge < 90 и старых окружений
 if (!Object.hasOwn) {
-    Object.hasOwn = function (obj: unknown, prop: string | symbol): boolean {
-        return Object.prototype.hasOwnProperty.call(
-            obj as Record<string, unknown>,
-            prop,
-        );
-    };
+  Object.hasOwn = function (obj: unknown, prop: string | symbol): boolean {
+    return Object.prototype.hasOwnProperty.call(
+      obj as Record<string, unknown>,
+      prop,
+    );
+  };
 }
 
 import "../css/app.css";
