@@ -17,6 +17,18 @@ export interface Document {
   updated_at: string;
 };
 
+export type DeliveryStatus = 'pending' | 'published' | 'failed';
+
+export interface DocumentDelivery {
+  message_id: string;
+  recipient: string;
+  status: DeliveryStatus;
+  status_label: string;
+  attempts: number;
+  last_error: string | null;
+  published_at: string | null;
+}
+
 export interface Application {
   id: number;
   can_edit: boolean;
@@ -43,6 +55,7 @@ export interface Application {
   sanatorium: Sanatorium;
   sanatoriumsAdditional: Sanatorium[];
   document: Document;
+  delivery: DocumentDelivery | null;
 }
 
 type RelativeValidationLabels = {

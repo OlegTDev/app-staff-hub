@@ -1,6 +1,6 @@
 import { BaseFilters, PaginatedData } from "@/types/pagination";
 import { Head, router } from "@inertiajs/react";
-import { EyeOutlined, EditOutlined, DeleteOutlined, BankTwoTone, IdcardTwoTone, PhoneTwoTone, CalendarFilled, CalendarOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined, BankTwoTone, IdcardTwoTone, PhoneTwoTone, CalendarOutlined, RedoOutlined } from "@ant-design/icons";
 import { Button, Divider, Drawer, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { Application, ApplicationLabels } from "./types";
 import { usePageBreadcrumbs } from "@/hooks/usePageBreadcrumbs";
@@ -67,6 +67,12 @@ export default function Index({ items, query, labels, isModerator, isAdmin }: Pa
   const handleDelete = (id: number) => {
     router.delete(route('documents.sanatoriums.destroy', id));
   };
+
+  const handleResend = (id: number) => {
+    router.post(route('documents.sanatoriums.resend', { documentSanatorium: id }), {}, { preserveScroll: true });
+  };
+
+  const canResend = isModerator || isAdmin;
 
   const pdfUrl = selectedDocumentId ? route('documents.pdf', { document: selectedDocumentId }) : '';
 
@@ -161,6 +167,29 @@ export default function Index({ items, query, labels, isModerator, isAdmin }: Pa
       },
     },
     {
+      title: 'Доставка',
+      key: 'delivery',
+      render: (record: Application) => {
+        const delivery = record.delivery;
+
+        if (!delivery) {
+          return <Tag color="default">Не отправлялось</Tag>;
+        }
+
+        if (delivery.status === 'pending') {
+          return <Tag color="processing">В очереди на передачу</Tag>;
+        } else if (delivery.status === 'published') {
+          return <Tag color="green">Передано в сервис отправки</Tag>;
+        }
+
+        return (
+          <Tooltip title={delivery.last_error}>
+            <Tag color="red">Ошибка передачи</Tag>
+          </Tooltip>
+        );
+      },
+    },
+    {
       title: 'Управление',
       render: (record: Application) => (
         <Space>
@@ -171,6 +200,19 @@ export default function Index({ items, query, labels, isModerator, isAdmin }: Pa
             <Tooltip title="Редактирование">
               <Button icon={<EditOutlined />} onClick={() => handleEdit(record.id)} />
             </Tooltip>
+          )}
+          {canResend && record.document.status === 'sended' && (
+            <Popconfirm
+              title="Повторная отправка"
+              description="Письмо с заявлением будет повторно передано в сервис отправки."
+              onConfirm={() => handleResend(record.id)}
+              okText="Отправить"
+              cancelText="Отмена"
+            >
+              <Tooltip title="Повторить отправку">
+                <Button icon={<RedoOutlined />} />
+              </Tooltip>
+            </Popconfirm>
           )}
           {record.can_delete && (
             <Popconfirm
@@ -185,7 +227,7 @@ export default function Index({ items, query, labels, isModerator, isAdmin }: Pa
           )}
         </Space>
       ),
-      width: 85,
+      width: 160,
     },
   ];
 

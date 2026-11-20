@@ -44,6 +44,12 @@ class DocumentSanatoriumResource extends JsonResource
             'can_delete' => $user !== null && Gate::forUser($user)->allows('delete', $this->resource),
 
             'document' => $this->whenLoaded('document', fn() => DocumentResource::make($this->document)),
+            'delivery' => $this->whenLoaded(
+                'document',
+                fn() => $this->document->latestDelivery !== null
+                    ? DocumentDeliveryResource::make($this->document->latestDelivery)
+                    : null,
+            ),
             'sanatorium' => $this->whenLoaded('sanatorium', fn() => SanatoriumResource::make($this->sanatorium)),
             'sanatoriumsAdditional' => $this->whenLoaded('sanatoriumsAdditional', fn() => SanatoriumResource::collection($this->sanatoriumsAdditional)),
         ];
